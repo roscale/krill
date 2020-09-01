@@ -21,12 +21,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Create git repository">
-      <change afterPath="$PROJECT_DIR$/src/io.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/serial.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Implement serial communication&#10;&#10;Receiving data is not implemented yet, just send.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/serial.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/serial.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +68,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo Command.Run - release">
+  <component name="RunManager" selected="Cargo Command.Run - debug">
     <configuration name="Build - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="build" />
@@ -153,7 +151,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1598870807017</updated>
-      <workItem from="1598870808537" duration="17848000" />
+      <workItem from="1598870808537" duration="27164000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -162,7 +160,14 @@
       <option name="project" value="LOCAL" />
       <updated>1598877419846</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Implement serial communication&#10;&#10;Receiving data is not implemented yet, just send.">
+      <created>1598890607045</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1598890607045</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -182,7 +187,8 @@
   <component name="VcsManagerConfiguration">
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
     <MESSAGE value="Create git repository" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create git repository" />
+    <MESSAGE value="Implement serial communication&#10;&#10;Receiving data is not implemented yet, just send." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement serial communication&#10;&#10;Receiving data is not implemented yet, just send." />
   </component>
   <component name="WindowStateProjectService">
     <state x="744" y="396" width="1071" height="772" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1598877268285">
@@ -205,34 +211,42 @@
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
     <state x="1135" y="602" key="Github.ShareDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1598877458624" />
-    <state width="716" height="1224" key="GridCell.Tab.0.bottom" timestamp="1598890328584">
+    <state width="716" height="1224" key="GridCell.Tab.0.bottom" timestamp="1598966329222">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
-    <state width="716" height="1224" key="GridCell.Tab.0.bottom/0.38.2560.1402@0.38.2560.1402" timestamp="1598890328584" />
+    <state width="716" height="1224" key="GridCell.Tab.0.bottom/0.38.2560.1402@0.38.2560.1402" timestamp="1598966329222" />
     <state width="2510" height="240" key="GridCell.Tab.0.bottom/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="716" height="1224" key="GridCell.Tab.0.center" timestamp="1598890328584">
+    <state width="716" height="1224" key="GridCell.Tab.0.center" timestamp="1598966329222">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
-    <state width="716" height="1224" key="GridCell.Tab.0.center/0.38.2560.1402@0.38.2560.1402" timestamp="1598890328584" />
+    <state width="716" height="1224" key="GridCell.Tab.0.center/0.38.2560.1402@0.38.2560.1402" timestamp="1598966329222" />
     <state width="2510" height="240" key="GridCell.Tab.0.center/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="716" height="1224" key="GridCell.Tab.0.left" timestamp="1598890328583">
+    <state width="716" height="1224" key="GridCell.Tab.0.left" timestamp="1598966329221">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
-    <state width="716" height="1224" key="GridCell.Tab.0.left/0.38.2560.1402@0.38.2560.1402" timestamp="1598890328583" />
+    <state width="716" height="1224" key="GridCell.Tab.0.left/0.38.2560.1402@0.38.2560.1402" timestamp="1598966329221" />
     <state width="2510" height="240" key="GridCell.Tab.0.left/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="716" height="1224" key="GridCell.Tab.0.right" timestamp="1598890328584">
+    <state width="716" height="1224" key="GridCell.Tab.0.right" timestamp="1598966329222">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
-    <state width="716" height="1224" key="GridCell.Tab.0.right/0.38.2560.1402@0.38.2560.1402" timestamp="1598890328584" />
+    <state width="716" height="1224" key="GridCell.Tab.0.right/0.38.2560.1402@0.38.2560.1402" timestamp="1598966329222" />
     <state width="2510" height="240" key="GridCell.Tab.0.right/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
     <state x="766" y="373" key="SettingsEditor" timestamp="1598876110409">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
     <state x="766" y="373" key="SettingsEditor/0.38.2560.1402@0.38.2560.1402" timestamp="1598876110409" />
+    <state x="880" y="470" key="Vcs.Push.Dialog.v2" timestamp="1598899540670">
+      <screen x="0" y="38" width="2560" height="1402" />
+    </state>
+    <state x="880" y="470" key="Vcs.Push.Dialog.v2/0.38.2560.1402@0.38.2560.1402" timestamp="1598899540670" />
     <state x="961" y="179" width="638" height="664" key="find.popup" timestamp="1598889155761">
       <screen x="0" y="38" width="2560" height="1402" />
     </state>
     <state x="961" y="179" width="638" height="664" key="find.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1598889155761" />
     <state x="961" y="287" width="638" height="903" key="find.popup/0.38.2560.2482@0.38.2560.2482" timestamp="1598885950498" />
+    <state x="944" y="346" key="run.anything.popup" timestamp="1598964570225">
+      <screen x="0" y="38" width="2560" height="1402" />
+    </state>
+    <state x="944" y="346" key="run.anything.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1598964570225" />
   </component>
 </project>

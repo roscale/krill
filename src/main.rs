@@ -18,15 +18,10 @@ mod serial;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    Serial(COM1).init();
-    Serial(COM2).init();
-    Serial(COM3).init();
-    Serial(COM4).init();
-
-    println!("Hello, {} {}", "World!", 42);
-    for char in "Ca fonctionne".bytes() {
-        print!("{} ", char as char);
-    }
+    Serial(COM1).init(38400);
+    Serial(COM2).init(38400);
+    Serial(COM3).init(38400);
+    Serial(COM4).init(38400);
 
     vga_print("Hello, World!");
 
@@ -37,11 +32,12 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 #[allow(unused_must_use)]
 fn panic(info: &PanicInfo) -> ! {
+    println!();
     println!("-------------------------------------------------");
     println!("KERNEL PANIC");
 
     if let Some(location) = info.location() {
-        println!("in file {}, at line {}, column {}",
+        println!("at {}:{}:{}",
                  location.file(),
                  location.line(),
                  location.column());
@@ -49,16 +45,14 @@ fn panic(info: &PanicInfo) -> ! {
         println!("at unknown location");
     }
 
-    if let Some(a) = info.message() {
-        if let Some(str) = a.as_str() {
-            println!("\n{}", str);
-        } else {
-            println!("\nTODO can't decode String message, needs heap allocation");
-        }
+    if let Some(message) = info.message() {
+        println!();
+        println!("{}", message);
     }
 
     if let Some(s) = info.payload().downcast_ref::<&str>() {
-        println!("\nwith payload:");
+        println!();
+        println!("with payload:");
         println!("{}", s);
     }
     println!("-------------------------------------------------");

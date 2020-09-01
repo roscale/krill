@@ -1,3 +1,5 @@
+//! https://wiki.osdev.org/Serial_Ports
+
 use core::fmt;
 use core::fmt::Write;
 
@@ -11,13 +13,24 @@ pub const COM4: u16 = 0x2E8;
 pub struct Serial(pub u16);
 
 impl Serial {
-    pub fn init(&self) {
-        io::outb(self.0 + 1, 0x00);
-        io::outb(self.0 + 3, 0x80);
-        io::outb(self.0 + 0, 0x03);
-        io::outb(self.0 + 1, 0x00);
-        io::outb(self.0 + 3, 0x03);
-        io::outb(self.0 + 4, 0x0B);
+    pub fn init(&self, baud_rate: u32) {
+        if 115200 % baud_rate != 0 {
+            panic!("Invalid baud rate {}. Value must divide 115200.", baud_rate);
+        }
+
+        io::outb(self.0 + 1, 0x00); // Disable interrupts
+        io::outb(self.0 + 3, 0x80); // Enable DLAB
+        {
+            // Set baud rate
+            let baud_rate_divisor = (115200 / baud_rate) as u16;
+            let baud_rate_lo = (baud_rate_divisor & 0x00FF) as u8;
+            let baud_rate_hi = (baud_rate_divisor >> 8) as u8;
+            io::outb(self.0 + 0, baud_rate_lo);
+            io::outb(self.0 + 1, baud_rate_hi);
+        }
+        io::outb(self.0 + 3, 0x03); // 8 bits, no parity, one stop bit
+        io::outb(self.0 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
+        io::outb(self.0 + 4, 0x0B); // IRQs enabled, RTS/DSR set
     }
 }
 
@@ -43,9 +56,7 @@ fn is_transmit_empty(com: u16) -> u8 {
 
 #[macro_export]
 macro_rules! println {
-    () => (
-        $crate::print!("\n")
-    );
+    () => (print!("\n"));
     ($($arg:tt)*) => (
         Serial(COM1).write_fmt(format_args_nl!($($arg)*)).unwrap()
     );
@@ -53,5 +64,7 @@ macro_rules! println {
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => (Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap())
+    ($($arg:tt)*) => (
+        Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap()
+    );
 }
