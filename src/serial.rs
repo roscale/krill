@@ -10,6 +10,7 @@ pub const COM2: u16 = 0x2F8;
 pub const COM3: u16 = 0x3E8;
 pub const COM4: u16 = 0x2E8;
 
+#[derive(Debug)]
 pub struct Serial(pub u16);
 
 impl Serial {
@@ -67,4 +68,27 @@ macro_rules! print {
     ($($arg:tt)*) => (
         Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap()
     );
+}
+
+#[macro_export]
+macro_rules! dbg {
+    () => {
+        println!("[{}:{}]", file!(), line!());
+    };
+    ($val:expr) => {
+        // Use of `match` here is intentional because it affects the lifetimes
+        // of temporaries - https://stackoverflow.com/a/48732525/1063961
+        match $val {
+            tmp => {
+                println!("[{}:{}] {} = {:#?}",
+                    file!(), line!(), stringify!($val), &tmp);
+                tmp
+            }
+        }
+    };
+    // Trailing comma with single argument is ignored
+    ($val:expr,) => { dbg!($val) };
+    ($($val:expr),+ $(,)?) => {
+        ($(dbg!($val)),+,)
+    };
 }

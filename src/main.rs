@@ -2,8 +2,13 @@
 #![feature(panic_info_message)]
 #![feature(fmt_as_str)]
 #![feature(format_args_nl)]
+#![feature(abi_x86_interrupt)]
+#![feature(stmt_expr_attributes)]
 #![no_std]
 #![no_main]
+
+#[macro_use]
+extern crate lazy_static;
 
 use core::fmt::Write;
 use core::panic::PanicInfo;
@@ -14,7 +19,9 @@ use crate::vga::vga_print;
 mod libstd;
 mod io;
 mod vga;
+#[macro_use]
 mod serial;
+mod idt;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -23,7 +30,14 @@ pub extern "C" fn _start() -> ! {
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
+    idt::IDT.load();
+
     vga_print("Hello, World!");
+
+
+    unsafe {
+        llvm_asm!("int3" :::: "volatile");
+    }
 
     loop {}
 }

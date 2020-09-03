@@ -1,0 +1,231 @@
+use core::fmt::{Display, Formatter};
+
+use core::mem::size_of;
+use core::fmt;
+
+lazy_static! {
+    pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
+}
+
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct StackFrame {
+    pub ip: u64,
+    pub cs: u64,
+    pub flags: u64,
+    pub sp: u64,
+    pub ss: u64,
+}
+
+impl Display for StackFrame {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        unsafe {
+            writeln!(f, "IP: {}", self.ip)?;
+            writeln!(f, "CS: {}", self.cs)?;
+            writeln!(f, "FLAGS: {}", self.flags)?;
+            writeln!(f, "SP: {}", self.sp)?;
+            writeln!(f, "SS: {}", self.ss)?;
+        }
+        Ok(())
+    }
+}
+
+#[repr(C, packed)]
+#[derive(Debug)]
+pub struct InterruptDescriptorTable {
+    pub divide_error: Descriptor,
+    pub debug: Descriptor,
+    pub non_maskable_interrupt: Descriptor,
+    pub breakpoint: Descriptor,
+    pub overflow: Descriptor,
+    pub bound_range_exceeded: Descriptor,
+    pub invalid_opcode: Descriptor,
+    pub device_not_available: Descriptor,
+    pub double_fault: Descriptor,
+    // no longer used
+    pub coprocessor_segment_overrun: Descriptor,
+    pub invalid_tss: Descriptor,
+    pub segment_not_present: Descriptor,
+    pub stack_segment_fault: Descriptor,
+    pub general_protection_fault: Descriptor,
+    pub page_fault: Descriptor,
+    reserved_1: Descriptor,
+    pub x87_floating_point: Descriptor,
+    pub alignment_check: Descriptor,
+    pub machine_check: Descriptor,
+    pub simd_floating_point: Descriptor,
+    pub virtualization: Descriptor,
+    reserved_2: [Descriptor; 9],
+    pub security_exception: Descriptor,
+    reserved_3: Descriptor,
+    interrupts: [Descriptor; 256 - 32],
+}
+
+impl InterruptDescriptorTable {
+    fn new() -> Self {
+        let code_segment = {
+            #[allow(unused_assignments)]
+            let mut segment: u16 = 0;
+            unsafe { llvm_asm!("mov %cs, $0" : "=r" (segment) ) };
+            segment
+        };
+        InterruptDescriptorTable {
+            divide_error: Descriptor::new(divide_error_handler as u64, code_segment, 0b1000_1110),
+            debug: Descriptor::new(debug_handler as u64, code_segment, 0b1000_1110),
+            non_maskable_interrupt: Descriptor::new(non_maskable_interrupt_handler as u64, code_segment, 0b1000_1110),
+            breakpoint: Descriptor::new(breakpoint_handler as u64, code_segment, 0b1000_1110),
+            overflow: Descriptor::new(overflow_handler as u64, code_segment, 0b1000_1110),
+            bound_range_exceeded: Descriptor::new(bound_range_exceeded_handler as u64, code_segment, 0b1000_1110),
+            invalid_opcode: Descriptor::new(invalid_opcode_handler as u64, code_segment, 0b1000_1110),
+            device_not_available: Descriptor::new(device_not_available_handler as u64, code_segment, 0b1000_1110),
+            double_fault: Descriptor::new(double_fault_handler as u64, code_segment, 0b1000_1110),
+            coprocessor_segment_overrun: Descriptor::new(coprocessor_segment_overrun_handler as u64, code_segment, 0b1000_1110),
+            invalid_tss: Descriptor::new(invalid_tss_handler as u64, code_segment, 0b1000_1110),
+            segment_not_present: Descriptor::new(segment_not_present_handler as u64, code_segment, 0b1000_1110),
+            stack_segment_fault: Descriptor::new(stack_segment_fault_handler as u64, code_segment, 0b1000_1110),
+            general_protection_fault: Descriptor::new(general_protection_fault_handler as u64, code_segment, 0b1000_1110),
+            page_fault: Descriptor::new(page_fault_handler as u64, code_segment, 0b1000_1110),
+            reserved_1: Descriptor::new(unused_handler as u64, 0, 0),
+            x87_floating_point: Descriptor::new(x87_floating_point_handler as u64, code_segment, 0b1000_1110),
+            alignment_check: Descriptor::new(alignment_check_handler as u64, code_segment, 0b1000_1110),
+            machine_check: Descriptor::new(machine_check_handler as u64, code_segment, 0b1000_1110),
+            simd_floating_point: Descriptor::new(simd_floating_point_handler as u64, code_segment, 0b1000_1110),
+            virtualization: Descriptor::new(virtualization_handler as u64, code_segment, 0b1000_1110),
+            reserved_2: [Descriptor::new(unused_handler as u64, 0, 0); 9],
+            security_exception: Descriptor::new(security_exception_handler as u64, code_segment, 0b1000_1110),
+            reserved_3: Descriptor::new(unused_handler as u64, 0, 0),
+            interrupts: [Descriptor::new(unused_handler as u64, 0, 0); 256 - 32],
+        }
+    }
+
+    pub fn load(&'static self) {
+        #[repr(C, packed)]
+        #[derive(Debug, Copy, Clone)]
+        struct IDTPointer {
+            pub size: u16,
+            pub address: u64,
+        }
+
+        let ptr = IDTPointer {
+            size: (size_of::<InterruptDescriptorTable>() - 1) as u16,
+            address: self as *const _ as u64,
+        };
+        unsafe {
+            llvm_asm!("lidt ($0)" :: "r" (&ptr) : "memory");
+        }
+    }
+}
+
+#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+pub struct Descriptor {
+    pub handler_address_low: u16,
+    pub segment_selector: u16,
+    pub ist: u8,
+    pub type_and_attributes: u8,
+    pub handler_address_middle: u16,
+    pub handler_address_high: u32,
+    pub zero: u32,
+}
+
+impl Descriptor {
+    fn new(handler_address: u64, segment_selector: u16, type_and_attributes: u8) -> Descriptor {
+        Self {
+            handler_address_low: handler_address as u16,
+            segment_selector,
+            ist: 0,
+            type_and_attributes,
+            handler_address_middle: (handler_address >> 16) as u16,
+            handler_address_high: (handler_address >> 32) as u32,
+            zero: 0,
+        }
+    }
+}
+
+extern "x86-interrupt" fn divide_error_handler(frame: StackFrame) {
+    panic!("divide_error\nStack frame:\n{}", frame);
+}
+
+extern "x86-interrupt" fn debug_handler(_frame: StackFrame) {
+    panic!("debug_handler");
+}
+
+extern "x86-interrupt" fn non_maskable_interrupt_handler(_frame: StackFrame) {
+    panic!("non_maskable_interrupt_handler");
+}
+
+extern "x86-interrupt" fn breakpoint_handler(_frame: StackFrame) {
+    panic!("breakpoint_handler");
+}
+
+extern "x86-interrupt" fn overflow_handler(_frame: StackFrame) {
+    panic!("overflow_handler");
+}
+
+extern "x86-interrupt" fn bound_range_exceeded_handler(_frame: StackFrame) {
+    panic!("bound_range_exceeded_handler");
+}
+
+extern "x86-interrupt" fn invalid_opcode_handler(_frame: StackFrame) {
+    panic!("invalid_opcode_handler");
+}
+
+extern "x86-interrupt" fn device_not_available_handler(_frame: StackFrame) {
+    panic!("device_not_available_handler");
+}
+
+extern "x86-interrupt" fn double_fault_handler(_frame: StackFrame, error_code: u64) {
+    panic!("double_fault_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn coprocessor_segment_overrun_handler(_frame: StackFrame) {
+    panic!("coprocessor_segment_overrun_handler");
+}
+
+extern "x86-interrupt" fn invalid_tss_handler(_frame: StackFrame, error_code: u64) {
+    panic!("invalid_tss_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn segment_not_present_handler(_frame: StackFrame, error_code: u64) {
+    panic!("segment_not_present_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn stack_segment_fault_handler(_frame: StackFrame, error_code: u64) {
+    panic!("stack_segment_fault_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, error_code: u64) {
+    panic!("general_protection_fault_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn page_fault_handler(_frame: StackFrame, error_code: u64) {
+    panic!("page_fault_handler with error code {}", error_code);
+}
+
+extern "x86-interrupt" fn x87_floating_point_handler(_frame: StackFrame) {
+    panic!("x87_floating_point")
+}
+
+extern "x86-interrupt" fn alignment_check_handler(_frame: StackFrame, error_code: u64) {
+    panic!("alignment_check {}", error_code)
+}
+
+extern "x86-interrupt" fn machine_check_handler(_frame: StackFrame) {
+    panic!("machine_check")
+}
+
+extern "x86-interrupt" fn simd_floating_point_handler(_frame: StackFrame) {
+    panic!("simd_floating_point")
+}
+
+extern "x86-interrupt" fn virtualization_handler(_frame: StackFrame) {
+    panic!("virtualization")
+}
+
+extern "x86-interrupt" fn security_exception_handler(_frame: StackFrame, error_code: u64) {
+    panic!("security_exception {}", error_code)
+}
+
+extern "x86-interrupt" fn unused_handler(_frame: StackFrame) {
+    panic!("unused interrupt");
+}
