@@ -3,7 +3,7 @@
 use core::fmt;
 use core::fmt::Write;
 
-use crate::io;
+use crate::inline_asm::{outb, inb};
 
 pub const COM1: u16 = 0x3F8;
 pub const COM2: u16 = 0x2F8;
@@ -19,19 +19,19 @@ impl Serial {
             panic!("Invalid baud rate {}. Value must divide 115200.", baud_rate);
         }
 
-        io::outb(self.0 + 1, 0x00); // Disable interrupts
-        io::outb(self.0 + 3, 0x80); // Enable DLAB
+        outb(self.0 + 1, 0x00); // Disable interrupts
+        outb(self.0 + 3, 0x80); // Enable DLAB
         {
             // Set baud rate
             let baud_rate_divisor = (115200 / baud_rate) as u16;
             let baud_rate_lo = (baud_rate_divisor & 0x00FF) as u8;
             let baud_rate_hi = (baud_rate_divisor >> 8) as u8;
-            io::outb(self.0 + 0, baud_rate_lo);
-            io::outb(self.0 + 1, baud_rate_hi);
+            outb(self.0 + 0, baud_rate_lo);
+            outb(self.0 + 1, baud_rate_hi);
         }
-        io::outb(self.0 + 3, 0x03); // 8 bits, no parity, one stop bit
-        io::outb(self.0 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
-        io::outb(self.0 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+        outb(self.0 + 3, 0x03); // 8 bits, no parity, one stop bit
+        outb(self.0 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
+        outb(self.0 + 4, 0x0B); // IRQs enabled, RTS/DSR set
     }
 }
 
@@ -47,12 +47,12 @@ impl Write for Serial {
 #[inline]
 fn write_char(com: u16, c: u8) {
     while is_transmit_empty(com) == 0 {}
-    io::outb(com, c);
+    outb(com, c);
 }
 
 #[inline]
 fn is_transmit_empty(com: u16) -> u8 {
-    io::inb(com + 5) & 0x20
+    inb(com + 5) & 0x20
 }
 
 #[macro_export]

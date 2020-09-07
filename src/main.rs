@@ -17,11 +17,13 @@ use crate::serial::{COM1, COM2, COM3, COM4, Serial};
 use crate::vga::vga_print;
 
 mod libstd;
-mod io;
+mod inline_asm;
 mod vga;
 #[macro_use]
 mod serial;
 mod idt;
+mod gdt;
+mod tss;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -30,14 +32,10 @@ pub extern "C" fn _start() -> ! {
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
+    gdt::GDT.load();
     idt::IDT.load();
 
     vga_print("Hello, World!");
-
-
-    unsafe {
-        llvm_asm!("int3" :::: "volatile");
-    }
 
     loop {}
 }

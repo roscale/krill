@@ -1,7 +1,10 @@
-use core::fmt::{Display, Formatter};
+//! https://wiki.osdev.org/IDT
 
-use core::mem::size_of;
+use core::fmt::{Display, Formatter};
 use core::fmt;
+use core::mem::size_of;
+
+use crate::inline_asm::{get_cs, lidt};
 
 lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
@@ -63,12 +66,7 @@ pub struct InterruptDescriptorTable {
 
 impl InterruptDescriptorTable {
     fn new() -> Self {
-        let code_segment = {
-            #[allow(unused_assignments)]
-            let mut segment: u16 = 0;
-            unsafe { llvm_asm!("mov %cs, $0" : "=r" (segment) ) };
-            segment
-        };
+        let code_segment = get_cs();
         InterruptDescriptorTable {
             divide_error: Descriptor::new(divide_error_handler as u64, code_segment, 0b1000_1110),
             debug: Descriptor::new(debug_handler as u64, code_segment, 0b1000_1110),
@@ -105,14 +103,10 @@ impl InterruptDescriptorTable {
             pub size: u16,
             pub address: u64,
         }
-
-        let ptr = IDTPointer {
+        lidt(&IDTPointer {
             size: (size_of::<InterruptDescriptorTable>() - 1) as u16,
             address: self as *const _ as u64,
-        };
-        unsafe {
-            llvm_asm!("lidt ($0)" :: "r" (&ptr) : "memory");
-        }
+        });
     }
 }
 
@@ -133,7 +127,7 @@ impl Descriptor {
         Self {
             handler_address_low: handler_address as u16,
             segment_selector,
-            ist: 0,
+            ist: 1, // Use the first stack of TSS for all the interrupts
             type_and_attributes,
             handler_address_middle: (handler_address >> 16) as u16,
             handler_address_high: (handler_address >> 32) as u32,
