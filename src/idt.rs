@@ -4,7 +4,11 @@ use core::fmt::{Display, Formatter};
 use core::fmt;
 use core::mem::size_of;
 
-use crate::inline_asm::{get_cs, lidt};
+use pc_keyboard::{DecodedKey, KeyCode, KeyState};
+
+use crate::inline_asm::{get_cs, lidt, without_interrupts};
+use crate::pic::{PIC_LINE_KEYBOARD, PIC_LINE_TIMER, send_eoi};
+use crate::ps2::read_keyboard_scancode;
 
 lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
@@ -61,7 +65,10 @@ pub struct InterruptDescriptorTable {
     reserved_2: [Descriptor; 9],
     pub security_exception: Descriptor,
     reserved_3: Descriptor,
-    interrupts: [Descriptor; 256 - 32],
+    // Hardware interrupts
+    pic_timer: Descriptor,
+    pic_keyboard: Descriptor,
+    interrupts: [Descriptor; 256 - 30],
 }
 
 impl InterruptDescriptorTable {
@@ -92,7 +99,9 @@ impl InterruptDescriptorTable {
             reserved_2: [Descriptor::new(unused_handler as u64, 0, 0); 9],
             security_exception: Descriptor::new(security_exception_handler as u64, code_segment, 0b1000_1110),
             reserved_3: Descriptor::new(unused_handler as u64, 0, 0),
-            interrupts: [Descriptor::new(unused_handler as u64, 0, 0); 256 - 32],
+            pic_timer: Descriptor::new(pic_timer_handler as u64, code_segment, 0b10001110),
+            pic_keyboard: Descriptor::new(pic_keyboard_handler as u64, code_segment, 0b10001110),
+            interrupts: [Descriptor::new(unused_handler as u64, 0, 0); 256 - 30],
         }
     }
 
@@ -149,7 +158,8 @@ extern "x86-interrupt" fn non_maskable_interrupt_handler(_frame: StackFrame) {
 }
 
 extern "x86-interrupt" fn breakpoint_handler(_frame: StackFrame) {
-    panic!("breakpoint_handler");
+    // panic!("breakpoint_handler");
+    println!("Breakpoint handler");
 }
 
 extern "x86-interrupt" fn overflow_handler(_frame: StackFrame) {
@@ -222,4 +232,36 @@ extern "x86-interrupt" fn security_exception_handler(_frame: StackFrame, error_c
 
 extern "x86-interrupt" fn unused_handler(_frame: StackFrame) {
     panic!("unused interrupt");
+}
+
+// Hardware interrupt handlers
+extern "x86-interrupt" fn pic_timer_handler(_frame: StackFrame) {
+    print!(".");
+    send_eoi(PIC_LINE_TIMER);
+}
+
+extern "x86-interrupt" fn pic_keyboard_handler(_frame: StackFrame) {
+    let scancode = read_keyboard_scancode();
+    use crate::ps2::KEYBOARD;
+
+    without_interrupts(|| {
+        let mut keyboard = KEYBOARD.lock();
+        if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
+            if let Some(decoded_key) = keyboard.process_keyevent(key_event.clone()) {
+                if key_event.state == KeyState::Down {
+                    match key_event.code {
+                        KeyCode::Enter => vga_println!(),
+                        KeyCode::Backspace => {},
+                        KeyCode::Tab => {},
+                        _ => {
+                            if let DecodedKey::Unicode(char) = decoded_key {
+                                vga_print!("{}", char);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+    send_eoi(PIC_LINE_KEYBOARD);
 }

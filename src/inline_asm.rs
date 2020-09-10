@@ -54,3 +54,55 @@ pub(crate) fn ltr(segment_selector: u16) {
         llvm_asm!("ltr $0" :: "r" (segment_selector));
     }
 }
+
+#[inline]
+pub(crate) fn disable_interrupts() {
+    unsafe {
+        llvm_asm!("cli" :::: "volatile");
+    }
+}
+
+#[inline]
+pub(crate) fn enable_interrupts() {
+    unsafe {
+        llvm_asm!("sti" :::: "volatile");
+    }
+}
+
+#[inline]
+pub(crate) fn io_wait() {
+    unsafe {
+        llvm_asm!("jmp 1f; \
+            1:jmp 2f; \
+            2:" :::: "volatile");
+    }
+}
+
+pub(crate) fn are_interrupts_enabled() -> bool {
+    let r: u64;
+    unsafe {
+        llvm_asm!("pushfq; popq $0" : "=r"(r) :: "memory")
+    }
+    r & (1 << 9) != 0
+}
+
+#[inline]
+pub(crate) fn without_interrupts<F>(f: F) where F: Fn() {
+    let were_interrupts_enabled = are_interrupts_enabled();
+    if were_interrupts_enabled {
+        disable_interrupts();
+    }
+    f();
+    if were_interrupts_enabled {
+        enable_interrupts();
+    }
+}
+
+#[inline]
+pub(crate) fn hlt_loop() -> ! {
+    loop {
+        unsafe {
+            llvm_asm!("hlt" :::: "volatile");
+        }
+    }
+}

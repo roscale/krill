@@ -9,21 +9,26 @@
 
 #[macro_use]
 extern crate lazy_static;
+extern crate pc_keyboard;
+extern crate spin;
 
-use core::fmt::Write;
 use core::panic::PanicInfo;
 
+use crate::inline_asm::hlt_loop;
+use crate::pic::init_pic;
 use crate::serial::{COM1, COM2, COM3, COM4, Serial};
-use crate::vga::vga_print;
 
 mod libstd;
 mod inline_asm;
+#[macro_use]
 mod vga;
 #[macro_use]
 mod serial;
 mod idt;
 mod gdt;
 mod tss;
+mod pic;
+mod ps2;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -35,9 +40,15 @@ pub extern "C" fn _start() -> ! {
     gdt::GDT.load();
     idt::IDT.load();
 
-    vga_print("Hello, World!");
+    {
+        let mut vga_text_state = vga::VGA_TEXT_STATE.lock();
+        vga_text_state.clear_screen();
+        vga_text_state.enable_cursor();
+    }
+    vga_print!("Keyboard support: ");
 
-    loop {}
+    init_pic();
+    hlt_loop();
 }
 
 /// Function called on panic
@@ -68,6 +79,5 @@ fn panic(info: &PanicInfo) -> ! {
         println!("{}", s);
     }
     println!("-------------------------------------------------");
-
     loop {}
 }

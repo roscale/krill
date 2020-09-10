@@ -3,7 +3,7 @@
 use core::fmt;
 use core::fmt::Write;
 
-use crate::inline_asm::{outb, inb};
+use crate::inline_asm::{inb, outb};
 
 pub const COM1: u16 = 0x3F8;
 pub const COM2: u16 = 0x2F8;
@@ -59,14 +59,28 @@ fn is_transmit_empty(com: u16) -> u8 {
 macro_rules! println {
     () => (print!("\n"));
     ($($arg:tt)*) => (
-        Serial(COM1).write_fmt(format_args_nl!($($arg)*)).unwrap()
+        {
+            use crate::serial::{Serial, COM1};
+            use core::fmt::Write;
+            use crate::inline_asm::without_interrupts;
+            without_interrupts(|| {
+                Serial(COM1).write_fmt(format_args_nl!($($arg)*)).unwrap();
+            })
+        }
     );
 }
 
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => (
-        Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap()
+        {
+            use crate::serial::{Serial, COM1};
+            use core::fmt::Write;
+            use crate::inline_asm::without_interrupts;
+            without_interrupts(|| {
+                Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap();
+            })
+        }
     );
 }
 

@@ -43,7 +43,7 @@ impl GlobalDescriptorTable {
         }
         lgdt(&GDTPointer {
             size: (size_of::<GlobalDescriptorTable>() - 1) as u16,
-            address: &self.null_descriptor as *const _ as u64,
+            address: self as *const _ as u64,
         });
         // Reload the CS
         let code_segment_selector = 1 << 3;
