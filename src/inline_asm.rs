@@ -15,7 +15,7 @@ pub(crate) fn inb(address: u16) -> u8 {
 }
 
 #[inline]
-pub(crate) fn get_cs() -> u16 {
+pub(crate) fn read_cs() -> u16 {
     let mut segment;
     unsafe {
         llvm_asm!("mov %cs, $0" : "=r" (segment));
@@ -105,4 +105,13 @@ pub(crate) fn hlt_loop() -> ! {
             llvm_asm!("hlt" :::: "volatile");
         }
     }
+}
+
+#[inline]
+pub(crate) fn read_cr2() -> u64 {
+    let value: u64;
+    unsafe {
+        llvm_asm!("mov %cr2, $0" : "=r" (value));
+    }
+    value
 }

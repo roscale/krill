@@ -17,26 +17,20 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" ENABLED="true" />
     </configurations>
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS.">
-      <change afterPath="$PROJECT_DIR$/src/pic.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ps2.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Set up the PIC and interrupts for the keyboard&#10;&#10;The translation of scancodes into characters is done via a &#10;third-party library. Additionally to show the keyboard in action, I &#10;improved the VGA text mode to support newlines, scrolling and cursor &#10;movement. Other than that, I did a few cleanups and wrapped global &#10;variables in mutexes based on spinning.">
+      <change afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gdt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gdt.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inline_asm.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/inline_asm.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/libstd.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/libstd.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/serial.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/serial.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vga.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/vga.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,67 +79,76 @@
       <recent name="$PROJECT_DIR$/.idea" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo Command.Run - debug">
-    <configuration name="Remote Debug" type="CLion_Remote" remoteCommand="tcp:localhost:1234" symbolFile="$PROJECT_DIR$/target/x86_64-krill/debug/krill" sysroot="$PROJECT_DIR$/src">
+  <component name="RunManager" selected="Cargo.Build - debug">
+    <configuration name="Remote Debug" type="CLion_Remote" version="1" remoteCommand="tcp:localhost:1234" symbolFile="$PROJECT_DIR$/target/x86_64-krill/debug/krill" sysroot="$PROJECT_DIR$/src">
+      <debugger kind="GDB" isBundled="true" />
       <pathMapping remote=":" local="" />
       <method v="2">
         <option name="RunConfigurationTask" enabled="true" run_configuration_name="Run daemonized" run_configuration_type="ShConfigurationType" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Build - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="build" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
     <configuration name="Build - release" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="build --release" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
     <configuration name="Run - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="run" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
     <configuration name="Run - release" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-      <option name="channel" value="DEFAULT" />
       <option name="command" value="run --release" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
     <configuration name="Run daemonized" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="" />
       <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
       <option name="SCRIPT_PATH" value="$PROJECT_DIR$/run_daemonized.sh" />
       <option name="SCRIPT_OPTIONS" value="" />
@@ -154,13 +157,16 @@
       <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
       <option name="INTERPRETER_PATH" value="/usr/bin/zsh" />
       <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Cargo Command.Build - debug" />
-      <item itemvalue="Cargo Command.Build - release" />
-      <item itemvalue="Cargo Command.Run - debug" />
-      <item itemvalue="Cargo Command.Run - release" />
+      <item itemvalue="Cargo.Build - debug" />
+      <item itemvalue="Cargo.Build - release" />
+      <item itemvalue="Cargo.Run - debug" />
+      <item itemvalue="Cargo.Run - release" />
       <item itemvalue="GDB Remote Debug.Remote Debug" />
       <item itemvalue="Shell Script.Run daemonized" />
     </list>
@@ -189,7 +195,17 @@
       <workItem from="1599501875924" duration="5267000" />
       <workItem from="1599562671197" duration="635000" />
       <workItem from="1599564366839" duration="22230000" />
-      <workItem from="1599744788907" duration="11576000" />
+      <workItem from="1599744788907" duration="16432000" />
+      <workItem from="1600117996293" duration="5344000" />
+      <workItem from="1600290960613" duration="6316000" />
+      <workItem from="1600456734742" duration="600000" />
+      <workItem from="1600929744615" duration="2000" />
+      <workItem from="1601765226658" duration="616000" />
+      <workItem from="1601807841812" duration="2000" />
+      <workItem from="1604505162052" duration="734000" />
+      <workItem from="1605210867915" duration="81000" />
+      <workItem from="1608840137766" duration="618000" />
+      <workItem from="1608844985187" duration="16000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -226,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1599505279524</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Set up the PIC and interrupts for the keyboard&#10;&#10;The translation of scancodes into characters is done via a &#10;third-party library. Additionally to show the keyboard in action, I &#10;improved the VGA text mode to support newlines, scrolling and cursor &#10;movement. Other than that, I did a few cleanups and wrapped global &#10;variables in mutexes based on spinning.">
+      <created>1599769570157</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1599769570157</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -251,126 +274,7 @@
     <MESSAGE value="Parameterize serial initialization function&#10;&#10;Add baud rate parameter and panic on invalid value." />
     <MESSAGE value="Create and load the IDT&#10;&#10;Put the CPU exceptions handlers in the IDT table. Make the OS debuggable&#10; from CLion by creating a few configurations." />
     <MESSAGE value="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS." />
-    <option name="LAST_COMMIT_MESSAGE" value="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS." />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="626" y="303" width="1071" height="899" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1599752182131">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="626" y="303" width="1071" height="899" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1599752182131" />
-    <state x="1048" y="530" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1598871014340">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1048" y="530" key="#com.intellij.fileTypes.FileTypeChooser/0.38.2560.1402@0.38.2560.1402" timestamp="1598871014340" />
-    <state x="1093" y="275" key="#com.intellij.ide.util.MemberChooser" timestamp="1599572437506">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1093" y="275" key="#com.intellij.ide.util.MemberChooser/0.38.2560.1402@0.38.2560.1402" timestamp="1599572437506" />
-    <state x="1093" y="457" key="#com.intellij.ide.util.MemberChooser/0.38.2560.2482@0.38.2560.2482" timestamp="1598884539890" />
-    <state x="1018" y="486" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1599768060049">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1018" y="486" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1599768060049" />
-    <state x="1020" y="598" width="479" height="653" key="#com.intellij.tools.ToolEditorDialog" timestamp="1599046362419">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1020" y="598" width="479" height="653" key="#com.intellij.tools.ToolEditorDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1599046362419" />
-    <state x="1279" y="435" key="#xdebugger.evaluate" timestamp="1599047718611">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1279" y="435" key="#xdebugger.evaluate/0.38.2560.1402@0.38.2560.1402" timestamp="1599047718611" />
-    <state x="256" y="163" key="DiffContextDialog" timestamp="1599505312079">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="256" y="163" key="DiffContextDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1599505312079" />
-    <state x="1067" y="525" key="FileChooserDialogImpl" timestamp="1599046746316">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1067" y="525" key="FileChooserDialogImpl/0.38.2560.1402@0.38.2560.1402" timestamp="1599046746316" />
-    <state x="1135" y="602" key="Github.ShareDialog" timestamp="1598877458624">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1135" y="602" key="Github.ShareDialog/0.38.2560.1402@0.38.2560.1402" timestamp="1598877458624" />
-    <state width="802" height="1224" key="GridCell.Tab.0.bottom" timestamp="1599768863355">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="802" height="1224" key="GridCell.Tab.0.bottom/0.38.2560.1402@0.38.2560.1402" timestamp="1599768863355" />
-    <state width="2510" height="240" key="GridCell.Tab.0.bottom/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="802" height="1224" key="GridCell.Tab.0.center" timestamp="1599768863355">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="802" height="1224" key="GridCell.Tab.0.center/0.38.2560.1402@0.38.2560.1402" timestamp="1599768863355" />
-    <state width="2510" height="240" key="GridCell.Tab.0.center/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="802" height="1224" key="GridCell.Tab.0.left" timestamp="1599768863355">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="802" height="1224" key="GridCell.Tab.0.left/0.38.2560.1402@0.38.2560.1402" timestamp="1599768863355" />
-    <state width="2510" height="240" key="GridCell.Tab.0.left/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="802" height="1224" key="GridCell.Tab.0.right" timestamp="1599768863355">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="802" height="1224" key="GridCell.Tab.0.right/0.38.2560.1402@0.38.2560.1402" timestamp="1599768863355" />
-    <state width="2510" height="240" key="GridCell.Tab.0.right/0.38.2560.2482@0.38.2560.2482" timestamp="1598886014314" />
-    <state width="2510" height="476" key="GridCell.Tab.1.bottom" timestamp="1599597024798">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="2510" height="476" key="GridCell.Tab.1.bottom/0.38.2560.1402@0.38.2560.1402" timestamp="1599597024798" />
-    <state width="2510" height="476" key="GridCell.Tab.1.center" timestamp="1599597024798">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="2510" height="476" key="GridCell.Tab.1.center/0.38.2560.1402@0.38.2560.1402" timestamp="1599597024798" />
-    <state width="2510" height="476" key="GridCell.Tab.1.left" timestamp="1599597024798">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="2510" height="476" key="GridCell.Tab.1.left/0.38.2560.1402@0.38.2560.1402" timestamp="1599597024798" />
-    <state width="2510" height="476" key="GridCell.Tab.1.right" timestamp="1599597024798">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="2510" height="476" key="GridCell.Tab.1.right/0.38.2560.1402@0.38.2560.1402" timestamp="1599597024798" />
-    <state x="306" y="329" width="1400" height="918" key="SettingsEditor" timestamp="1599580279831">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="306" y="329" width="1400" height="918" key="SettingsEditor/0.38.2560.1402@0.38.2560.1402" timestamp="1599580279831" />
-    <state width="498" height="534" key="SwitcherDM" timestamp="1599577330558">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state width="498" height="534" key="SwitcherDM/0.38.2560.1402@0.38.2560.1402" timestamp="1599577330558" />
-    <state x="880" y="470" key="Vcs.Push.Dialog.v2" timestamp="1599505312975">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="880" y="470" key="Vcs.Push.Dialog.v2/0.38.2560.1402@0.38.2560.1402" timestamp="1599505312975" />
-    <state x="808" y="339" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1599083891858">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="808" y="339" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.38.2560.1402@0.38.2560.1402" timestamp="1599083891858" />
-    <state x="1062" y="650" width="436" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1599593576476">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1062" y="650" width="436" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.38.2560.1402@0.38.2560.1402" timestamp="1599593576476" />
-    <state x="898" y="414" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey" timestamp="1599046363763">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="898" y="414" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey/0.38.2560.1402@0.38.2560.1402" timestamp="1599046363763" />
-    <state x="98" y="393" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1599162964750">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="98" y="393" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.38.2560.1402@0.38.2560.1402" timestamp="1599162964750" />
-    <state x="761" y="179" width="838" height="935" key="find.popup" timestamp="1599767972077">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="761" y="179" width="838" height="935" key="find.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1599767972077" />
-    <state x="961" y="287" width="638" height="903" key="find.popup/0.38.2560.2482@0.38.2560.2482" timestamp="1598885950498" />
-    <state x="555" y="276" width="1170" height="839" key="recent.locations.popup" timestamp="1599577340693">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="555" y="276" width="1170" height="839" key="recent.locations.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1599577340693" />
-    <state x="944" y="346" key="run.anything.popup" timestamp="1599503513632">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="944" y="346" key="run.anything.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1599503513632" />
-    <state x="1124" y="341" width="672" height="678" key="search.everywhere.popup" timestamp="1599593375010">
-      <screen x="0" y="38" width="2560" height="1402" />
-    </state>
-    <state x="1124" y="341" width="672" height="678" key="search.everywhere.popup/0.38.2560.1402@0.38.2560.1402" timestamp="1599593375010" />
+    <MESSAGE value="Set up the PIC and interrupts for the keyboard&#10;&#10;The translation of scancodes into characters is done via a &#10;third-party library. Additionally to show the keyboard in action, I &#10;improved the VGA text mode to support newlines, scrolling and cursor &#10;movement. Other than that, I did a few cleanups and wrapped global &#10;variables in mutexes based on spinning." />
+    <option name="LAST_COMMIT_MESSAGE" value="Set up the PIC and interrupts for the keyboard&#10;&#10;The translation of scancodes into characters is done via a &#10;third-party library. Additionally to show the keyboard in action, I &#10;improved the VGA text mode to support newlines, scrolling and cursor &#10;movement. Other than that, I did a few cleanups and wrapped global &#10;variables in mutexes based on spinning." />
   </component>
 </project>

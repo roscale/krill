@@ -6,7 +6,7 @@ use core::mem::size_of;
 
 use pc_keyboard::{DecodedKey, KeyCode, KeyState};
 
-use crate::inline_asm::{get_cs, lidt, without_interrupts};
+use crate::inline_asm::{lidt, read_cr2, read_cs, without_interrupts};
 use crate::pic::{PIC_LINE_KEYBOARD, PIC_LINE_TIMER, send_eoi};
 use crate::ps2::read_keyboard_scancode;
 
@@ -14,6 +14,8 @@ lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
 }
 
+/// LLVM will automatically push other general purpose registers on the stack.
+/// This stack frame doesn't have to include those registers.
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct StackFrame {
@@ -73,7 +75,7 @@ pub struct InterruptDescriptorTable {
 
 impl InterruptDescriptorTable {
     fn new() -> Self {
-        let code_segment = get_cs();
+        let code_segment = read_cs();
         InterruptDescriptorTable {
             divide_error: Descriptor::new(divide_error_handler as u64, code_segment, 0b1000_1110),
             debug: Descriptor::new(debug_handler as u64, code_segment, 0b1000_1110),
@@ -203,7 +205,8 @@ extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, e
 }
 
 extern "x86-interrupt" fn page_fault_handler(_frame: StackFrame, error_code: u64) {
-    panic!("page_fault_handler with error code {}", error_code);
+    panic!("Page fault with error code {}.\n\
+            Tried to access virtual address 0x{:x}", error_code, read_cr2());
 }
 
 extern "x86-interrupt" fn x87_floating_point_handler(_frame: StackFrame) {
