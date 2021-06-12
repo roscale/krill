@@ -13,7 +13,7 @@ extern crate spin;
 use core::panic::PanicInfo;
 
 use crate::inline_asm::hlt_loop;
-// use crate::pic::init_pic;
+use crate::pic::init_pic;
 use crate::serial::{COM1, COM2, COM3, COM4, Serial};
 
 mod libstd;
@@ -23,10 +23,10 @@ mod vga;
 #[macro_use]
 mod serial;
 mod gdt;
-// mod idt;
+mod idt;
 mod tss;
-// mod pic;
-// mod ps2;
+mod pic;
+mod ps2;
 
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
@@ -35,13 +35,8 @@ pub extern "C" fn kernel_main() -> ! {
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
-    let a = 3;
-    let b = 3;
-    let c = 3;
-    let d = 3;
-
     gdt::GDT.load();
-    // idt::IDT.load();
+    idt::IDT.load();
 
     {
         let mut vga_text_state = vga::VGA_TEXT_STATE.lock();
@@ -50,7 +45,7 @@ pub extern "C" fn kernel_main() -> ! {
     }
     vga_print!("Keyboard support: ");
 
-    // init_pic();
+    init_pic();
     hlt_loop();
 }
 

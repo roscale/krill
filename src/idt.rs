@@ -14,25 +14,23 @@ lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
 }
 
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct StackFrame {
-    pub ip: u64,
-    pub cs: u64,
-    pub flags: u64,
-    pub sp: u64,
-    pub ss: u64,
+    pub ip: u32,
+    pub cs: u32,
+    pub flags: u32,
+    pub sp: u32,
+    pub ss: u32,
 }
 
 impl Display for StackFrame {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        unsafe {
-            writeln!(f, "IP: {}", self.ip)?;
-            writeln!(f, "CS: {}", self.cs)?;
-            writeln!(f, "FLAGS: {}", self.flags)?;
-            writeln!(f, "SP: {}", self.sp)?;
-            writeln!(f, "SS: {}", self.ss)?;
-        }
+        writeln!(f, "IP: {}", self.ip)?;
+        writeln!(f, "CS: {}", self.cs)?;
+        writeln!(f, "FLAGS: {}", self.flags)?;
+        writeln!(f, "SP: {}", self.sp)?;
+        writeln!(f, "SS: {}", self.ss)?;
         Ok(())
     }
 }
@@ -75,33 +73,33 @@ impl InterruptDescriptorTable {
     fn new() -> Self {
         let code_segment = get_cs();
         InterruptDescriptorTable {
-            divide_error: Descriptor::new(divide_error_handler as u64, code_segment, 0b1000_1110),
-            debug: Descriptor::new(debug_handler as u64, code_segment, 0b1000_1110),
-            non_maskable_interrupt: Descriptor::new(non_maskable_interrupt_handler as u64, code_segment, 0b1000_1110),
-            breakpoint: Descriptor::new(breakpoint_handler as u64, code_segment, 0b1000_1110),
-            overflow: Descriptor::new(overflow_handler as u64, code_segment, 0b1000_1110),
-            bound_range_exceeded: Descriptor::new(bound_range_exceeded_handler as u64, code_segment, 0b1000_1110),
-            invalid_opcode: Descriptor::new(invalid_opcode_handler as u64, code_segment, 0b1000_1110),
-            device_not_available: Descriptor::new(device_not_available_handler as u64, code_segment, 0b1000_1110),
-            double_fault: Descriptor::new(double_fault_handler as u64, code_segment, 0b1000_1110),
-            coprocessor_segment_overrun: Descriptor::new(coprocessor_segment_overrun_handler as u64, code_segment, 0b1000_1110),
-            invalid_tss: Descriptor::new(invalid_tss_handler as u64, code_segment, 0b1000_1110),
-            segment_not_present: Descriptor::new(segment_not_present_handler as u64, code_segment, 0b1000_1110),
-            stack_segment_fault: Descriptor::new(stack_segment_fault_handler as u64, code_segment, 0b1000_1110),
-            general_protection_fault: Descriptor::new(general_protection_fault_handler as u64, code_segment, 0b1000_1110),
-            page_fault: Descriptor::new(page_fault_handler as u64, code_segment, 0b1000_1110),
-            reserved_1: Descriptor::new(unused_handler as u64, 0, 0),
-            x87_floating_point: Descriptor::new(x87_floating_point_handler as u64, code_segment, 0b1000_1110),
-            alignment_check: Descriptor::new(alignment_check_handler as u64, code_segment, 0b1000_1110),
-            machine_check: Descriptor::new(machine_check_handler as u64, code_segment, 0b1000_1110),
-            simd_floating_point: Descriptor::new(simd_floating_point_handler as u64, code_segment, 0b1000_1110),
-            virtualization: Descriptor::new(virtualization_handler as u64, code_segment, 0b1000_1110),
-            reserved_2: [Descriptor::new(unused_handler as u64, 0, 0); 9],
-            security_exception: Descriptor::new(security_exception_handler as u64, code_segment, 0b1000_1110),
-            reserved_3: Descriptor::new(unused_handler as u64, 0, 0),
-            pic_timer: Descriptor::new(pic_timer_handler as u64, code_segment, 0b10001110),
-            pic_keyboard: Descriptor::new(pic_keyboard_handler as u64, code_segment, 0b10001110),
-            interrupts: [Descriptor::new(unused_handler as u64, 0, 0); 256 - 30],
+            divide_error: Descriptor::new(divide_error_handler as u32, code_segment, 0b1000_1110),
+            debug: Descriptor::new(debug_handler as u32, code_segment, 0b1000_1110),
+            non_maskable_interrupt: Descriptor::new(non_maskable_interrupt_handler as u32, code_segment, 0b1000_1110),
+            breakpoint: Descriptor::new(breakpoint_handler as u32, code_segment, 0b1000_1110),
+            overflow: Descriptor::new(overflow_handler as u32, code_segment, 0b1000_1110),
+            bound_range_exceeded: Descriptor::new(bound_range_exceeded_handler as u32, code_segment, 0b1000_1110),
+            invalid_opcode: Descriptor::new(invalid_opcode_handler as u32, code_segment, 0b1000_1110),
+            device_not_available: Descriptor::new(device_not_available_handler as u32, code_segment, 0b1000_1110),
+            double_fault: Descriptor::new(double_fault_handler as u32, code_segment, 0b1000_1110),
+            coprocessor_segment_overrun: Descriptor::new(coprocessor_segment_overrun_handler as u32, code_segment, 0b1000_1110),
+            invalid_tss: Descriptor::new(invalid_tss_handler as u32, code_segment, 0b1000_1110),
+            segment_not_present: Descriptor::new(segment_not_present_handler as u32, code_segment, 0b1000_1110),
+            stack_segment_fault: Descriptor::new(stack_segment_fault_handler as u32, code_segment, 0b1000_1110),
+            general_protection_fault: Descriptor::new(general_protection_fault_handler as u32, code_segment, 0b1000_1110),
+            page_fault: Descriptor::new(page_fault_handler as u32, code_segment, 0b1000_1110),
+            reserved_1: Descriptor::new(unused_handler as u32, 0, 0),
+            x87_floating_point: Descriptor::new(x87_floating_point_handler as u32, code_segment, 0b1000_1110),
+            alignment_check: Descriptor::new(alignment_check_handler as u32, code_segment, 0b1000_1110),
+            machine_check: Descriptor::new(machine_check_handler as u32, code_segment, 0b1000_1110),
+            simd_floating_point: Descriptor::new(simd_floating_point_handler as u32, code_segment, 0b1000_1110),
+            virtualization: Descriptor::new(virtualization_handler as u32, code_segment, 0b1000_1110),
+            reserved_2: [Descriptor::new(unused_handler as u32, 0, 0); 9],
+            security_exception: Descriptor::new(security_exception_handler as u32, code_segment, 0b1000_1110),
+            reserved_3: Descriptor::new(unused_handler as u32, 0, 0),
+            pic_timer: Descriptor::new(pic_timer_handler as u32, code_segment, 0b10001110),
+            pic_keyboard: Descriptor::new(pic_keyboard_handler as u32, code_segment, 0b10001110),
+            interrupts: [Descriptor::new(unused_handler as u32, 0, 0); 256 - 30],
         }
     }
 
@@ -110,11 +108,11 @@ impl InterruptDescriptorTable {
         #[derive(Debug, Copy, Clone)]
         struct IDTPointer {
             pub size: u16,
-            pub address: u64,
+            pub address: u32,
         }
         lidt(&IDTPointer {
             size: (size_of::<InterruptDescriptorTable>() - 1) as u16,
-            address: self as *const _ as u64,
+            address: self as *const _ as u32,
         });
     }
 }
@@ -124,23 +122,19 @@ impl InterruptDescriptorTable {
 pub struct Descriptor {
     pub handler_address_low: u16,
     pub segment_selector: u16,
-    pub ist: u8,
+    pub zero: u8,
     pub type_and_attributes: u8,
-    pub handler_address_middle: u16,
-    pub handler_address_high: u32,
-    pub zero: u32,
+    pub handler_address_high: u16,
 }
 
 impl Descriptor {
-    fn new(handler_address: u64, segment_selector: u16, type_and_attributes: u8) -> Descriptor {
+    fn new(handler_address: u32, segment_selector: u16, type_and_attributes: u8) -> Descriptor {
         Self {
             handler_address_low: handler_address as u16,
             segment_selector,
-            ist: 1, // Use the first stack of TSS for all the interrupts
-            type_and_attributes,
-            handler_address_middle: (handler_address >> 16) as u16,
-            handler_address_high: (handler_address >> 32) as u32,
             zero: 0,
+            type_and_attributes,
+            handler_address_high: (handler_address >> 16) as u16,
         }
     }
 }
@@ -178,7 +172,7 @@ extern "x86-interrupt" fn device_not_available_handler(_frame: StackFrame) {
     panic!("device_not_available_handler");
 }
 
-extern "x86-interrupt" fn double_fault_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn double_fault_handler(_frame: StackFrame, error_code: u32) {
     panic!("double_fault_handler with error code {}", error_code);
 }
 
@@ -186,23 +180,23 @@ extern "x86-interrupt" fn coprocessor_segment_overrun_handler(_frame: StackFrame
     panic!("coprocessor_segment_overrun_handler");
 }
 
-extern "x86-interrupt" fn invalid_tss_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn invalid_tss_handler(_frame: StackFrame, error_code: u32) {
     panic!("invalid_tss_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn segment_not_present_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn segment_not_present_handler(_frame: StackFrame, error_code: u32) {
     panic!("segment_not_present_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn stack_segment_fault_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn stack_segment_fault_handler(_frame: StackFrame, error_code: u32) {
     panic!("stack_segment_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, error_code: u32) {
     panic!("general_protection_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn page_fault_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn page_fault_handler(_frame: StackFrame, error_code: u32) {
     panic!("page_fault_handler with error code {}", error_code);
 }
 
@@ -210,7 +204,7 @@ extern "x86-interrupt" fn x87_floating_point_handler(_frame: StackFrame) {
     panic!("x87_floating_point")
 }
 
-extern "x86-interrupt" fn alignment_check_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn alignment_check_handler(_frame: StackFrame, error_code: u32) {
     panic!("alignment_check {}", error_code)
 }
 
@@ -226,7 +220,7 @@ extern "x86-interrupt" fn virtualization_handler(_frame: StackFrame) {
     panic!("virtualization")
 }
 
-extern "x86-interrupt" fn security_exception_handler(_frame: StackFrame, error_code: u64) {
+extern "x86-interrupt" fn security_exception_handler(_frame: StackFrame, error_code: u32) {
     panic!("security_exception {}", error_code)
 }
 
