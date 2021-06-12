@@ -122,11 +122,11 @@ macro_rules! vga_println {
     ($($arg:tt)*) => (
         {
             use core::fmt::Write;
-            use crate::inline_asm::without_interrupts;
+            // use crate::inline_asm::without_interrupts;
             use crate::vga::VGA_TEXT_STATE;
-            without_interrupts(|| {
+            // without_interrupts(|| {
                 VGA_TEXT_STATE.lock().write_fmt(format_args_nl!($($arg)*)).unwrap();
-            })
+            // })
         }
     );
 }
@@ -136,11 +136,11 @@ macro_rules! vga_print {
     ($($arg:tt)*) => (
         {
             use core::fmt::Write;
-            use crate::inline_asm::without_interrupts;
+            // use crate::inline_asm::without_interrupts;
             use crate::vga::VGA_TEXT_STATE;
-            without_interrupts(|| {
+            // without_interrupts(|| {
                 VGA_TEXT_STATE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-            })
+            // })
         }
     );
 }

@@ -1,11 +1,9 @@
 #![feature(llvm_asm)]
 #![feature(panic_info_message)]
-#![feature(fmt_as_str)]
 #![feature(format_args_nl)]
 #![feature(abi_x86_interrupt)]
 #![feature(stmt_expr_attributes)]
 #![no_std]
-#![no_main]
 
 #[macro_use]
 extern crate lazy_static;
@@ -15,7 +13,7 @@ extern crate spin;
 use core::panic::PanicInfo;
 
 use crate::inline_asm::hlt_loop;
-use crate::pic::init_pic;
+// use crate::pic::init_pic;
 use crate::serial::{COM1, COM2, COM3, COM4, Serial};
 
 mod libstd;
@@ -24,21 +22,21 @@ mod inline_asm;
 mod vga;
 #[macro_use]
 mod serial;
-mod idt;
-mod gdt;
-mod tss;
-mod pic;
-mod ps2;
+// mod idt;
+// mod gdt;
+// mod tss;
+// mod pic;
+// mod ps2;
 
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn kernel_main() -> ! {
     Serial(COM1).init(38400);
     Serial(COM2).init(38400);
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
-    gdt::GDT.load();
-    idt::IDT.load();
+    // gdt::GDT.load();
+    // idt::IDT.load();
 
     {
         let mut vga_text_state = vga::VGA_TEXT_STATE.lock();
@@ -46,8 +44,8 @@ pub extern "C" fn _start() -> ! {
         vga_text_state.enable_cursor();
     }
     vga_print!("Keyboard support: ");
-
-    init_pic();
+    dbg!("Serial test");
+    // init_pic();
     hlt_loop();
 }
 

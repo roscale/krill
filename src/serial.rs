@@ -62,10 +62,10 @@ macro_rules! println {
         {
             use crate::serial::{Serial, COM1};
             use core::fmt::Write;
-            use crate::inline_asm::without_interrupts;
-            without_interrupts(|| {
+            // use crate::inline_asm::without_interrupts;
+            // without_interrupts(|| {
                 Serial(COM1).write_fmt(format_args_nl!($($arg)*)).unwrap();
-            })
+            // })
         }
     );
 }
@@ -76,10 +76,10 @@ macro_rules! print {
         {
             use crate::serial::{Serial, COM1};
             use core::fmt::Write;
-            use crate::inline_asm::without_interrupts;
-            without_interrupts(|| {
+            // use crate::inline_asm::without_interrupts;
+            // without_interrupts(|| {
                 Serial(COM1).write_fmt(format_args!($($arg)*)).unwrap();
-            })
+            // })
         }
     );
 }

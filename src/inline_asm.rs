@@ -37,16 +37,16 @@ pub(crate) fn lidt<T>(ptr: &T) {
     }
 }
 
-#[inline]
-pub(crate) fn reload_cs(segment_selector: u64) {
-    unsafe {
-        llvm_asm!("pushq $0; \
-                leaq  1f(%rip), %rax; \
-                pushq %rax; \
-                lretq; \
-                1:" :: "ri" (segment_selector) : "rax" "memory");
-    }
-}
+// #[inline]
+// pub(crate) fn reload_cs(segment_selector: u64) {
+//     unsafe {
+//         llvm_asm!("pushq $0; \
+//                 leaq  1f(%rip), %rax; \
+//                 pushq %rax; \
+//                 lretq; \
+//                 1:" :: "ri" (segment_selector) : "rax" "memory");
+//     }
+// }
 
 #[inline]
 pub(crate) fn ltr(segment_selector: u16) {
@@ -78,25 +78,25 @@ pub(crate) fn io_wait() {
     }
 }
 
-pub(crate) fn are_interrupts_enabled() -> bool {
-    let r: u64;
-    unsafe {
-        llvm_asm!("pushfq; popq $0" : "=r"(r) :: "memory")
-    }
-    r & (1 << 9) != 0
-}
+// pub(crate) fn are_interrupts_enabled() -> bool {
+//     let r: u64;
+//     unsafe {
+//         llvm_asm!("pushfq; popq $0" : "=r"(r) :: "memory")
+//     }
+//     r & (1 << 9) != 0
+// }
 
-#[inline]
-pub(crate) fn without_interrupts<F>(f: F) where F: Fn() {
-    let were_interrupts_enabled = are_interrupts_enabled();
-    if were_interrupts_enabled {
-        disable_interrupts();
-    }
-    f();
-    if were_interrupts_enabled {
-        enable_interrupts();
-    }
-}
+// #[inline]
+// pub(crate) fn without_interrupts<F>(f: F) where F: Fn() {
+//     let were_interrupts_enabled = are_interrupts_enabled();
+//     if were_interrupts_enabled {
+//         disable_interrupts();
+//     }
+//     f();
+//     if were_interrupts_enabled {
+//         enable_interrupts();
+//     }
+// }
 
 #[inline]
 pub(crate) fn hlt_loop() -> ! {

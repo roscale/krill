@@ -1,8 +1,6 @@
 [build]
-target = "x86_64-krill.json"
-
-[target.'cfg(target_os = "none")']
-runner = "bootimage runner"
+target = "i686-krill.json"
 
 [unstable]
+build-std-features = ["compiler-builtins-mem"]
 build-std = ["core", "compiler_builtins"]
