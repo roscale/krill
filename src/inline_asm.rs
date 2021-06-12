@@ -37,17 +37,6 @@ pub(crate) fn lidt<T>(ptr: &T) {
     }
 }
 
-// #[inline]
-// pub(crate) fn reload_cs(segment_selector: u64) {
-//     unsafe {
-//         llvm_asm!("pushq $0; \
-//                 leaq  1f(%rip), %rax; \
-//                 pushq %rax; \
-//                 lretq; \
-//                 1:" :: "ri" (segment_selector) : "rax" "memory");
-//     }
-// }
-
 #[inline]
 pub(crate) fn ltr(segment_selector: u16) {
     unsafe {

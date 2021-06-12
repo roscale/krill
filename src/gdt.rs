@@ -3,7 +3,7 @@
 
 use core::mem::size_of;
 
-use crate::inline_asm::{lgdt, ltr, reload_cs};
+use crate::inline_asm::{lgdt, ltr};
 use crate::tss::{TaskStateSegment, TSS};
 
 lazy_static! {
@@ -23,8 +23,8 @@ impl GlobalDescriptorTable {
     pub fn new() -> GlobalDescriptorTable {
         GlobalDescriptorTable {
             null_descriptor: Descriptor::new(0, 0, 0, 0),
-            code_segment: Descriptor::new(0, 0xFFFFF, 0x9A, 0xA),
-            data_segment: Descriptor::new(0, 0xFFFFF, 0x92, 0xA),
+            code_segment: Descriptor::new(0, 0xFFFFF, 0x9A, 0xC),
+            data_segment: Descriptor::new(0, 0xFFFFF, 0x92, 0xC),
             tss_segment: TSSDescriptor::new(
                 &*TSS as *const _ as u64,
                 (size_of::<TaskStateSegment>() - 1) as u32,
@@ -39,15 +39,18 @@ impl GlobalDescriptorTable {
         #[derive(Debug, Copy, Clone)]
         struct GDTPointer {
             pub size: u16,
-            pub address: u64,
+            pub address: u32,
         }
         lgdt(&GDTPointer {
             size: (size_of::<GlobalDescriptorTable>() - 1) as u16,
-            address: self as *const _ as u64,
+            address: self as *const _ as u32,
         });
-        // Reload the CS
-        let code_segment_selector = 1 << 3;
-        reload_cs(code_segment_selector);
+
+        extern "C" {
+            fn reload_segments();
+        }
+        unsafe { reload_segments(); }
+
         // Load the TSS
         let tss_segment_selector = 3 << 3;
         ltr(tss_segment_selector);

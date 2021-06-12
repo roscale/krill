@@ -22,9 +22,9 @@ mod inline_asm;
 mod vga;
 #[macro_use]
 mod serial;
+mod gdt;
 // mod idt;
-// mod gdt;
-// mod tss;
+mod tss;
 // mod pic;
 // mod ps2;
 
@@ -35,7 +35,12 @@ pub extern "C" fn kernel_main() -> ! {
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
-    // gdt::GDT.load();
+    let a = 3;
+    let b = 3;
+    let c = 3;
+    let d = 3;
+
+    gdt::GDT.load();
     // idt::IDT.load();
 
     {
