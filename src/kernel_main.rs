@@ -44,7 +44,7 @@ pub extern "C" fn kernel_main() -> ! {
         vga_text_state.enable_cursor();
     }
     vga_print!("Keyboard support: ");
-    dbg!("Serial test");
+
     // init_pic();
     hlt_loop();
 }

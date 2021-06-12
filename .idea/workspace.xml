@@ -24,24 +24,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS.">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Remote_Debug.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/all.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/run_debug.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/linker.ld" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/boot.s" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.cargo/config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/.cargo/config.toml" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Remove Rust bootloader magic and make the kernel 32-bit for now">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inline_asm.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/inline_asm.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/serial.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/serial.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vga.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/vga.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/x86_64-krill.json" beforeDir="false" afterPath="$PROJECT_DIR$/i686-krill.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +93,7 @@
       <recent name="$PROJECT_DIR$/.idea" />
     </key>
   </component>
-  <component name="RunManager" selected="Makefile Target.run">
+  <component name="RunManager" selected="GDB Remote Debug.Remote Debug">
     <configuration name="Build - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="build" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -180,7 +168,7 @@
       <workItem from="1599562671197" duration="635000" />
       <workItem from="1599564366839" duration="22230000" />
       <workItem from="1599744788907" duration="11576000" />
-      <workItem from="1623501905815" duration="7792000" />
+      <workItem from="1623501905815" duration="9223000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -217,7 +205,14 @@
       <option name="project" value="LOCAL" />
       <updated>1599505279524</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Remove Rust bootloader magic and make the kernel 32-bit for now">
+      <created>1623511213694</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1623511213694</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +237,7 @@
     <MESSAGE value="Parameterize serial initialization function&#10;&#10;Add baud rate parameter and panic on invalid value." />
     <MESSAGE value="Create and load the IDT&#10;&#10;Put the CPU exceptions handlers in the IDT table. Make the OS debuggable&#10; from CLion by creating a few configurations." />
     <MESSAGE value="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS." />
-    <option name="LAST_COMMIT_MESSAGE" value="Load the GDT and add a TSS segment for interrupts&#10;&#10;This commit gets rid of a triple fault when overflowing the stack. All &#10;CPU exceptions now use the first stack in the TSS." />
+    <MESSAGE value="Remove Rust bootloader magic and make the kernel 32-bit for now" />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove Rust bootloader magic and make the kernel 32-bit for now" />
   </component>
 </project>
