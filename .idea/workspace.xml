@@ -24,10 +24,14 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Restore the GDT">
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Restore the IDT">
+      <change afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/util.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linker.ld" beforeDir="false" afterPath="$PROJECT_DIR$/linker.ld" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/boot.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/boot.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +83,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="fileTemplates" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -166,7 +170,7 @@
       <workItem from="1599562671197" duration="635000" />
       <workItem from="1599564366839" duration="22230000" />
       <workItem from="1599744788907" duration="11576000" />
-      <workItem from="1623501905815" duration="20384000" />
+      <workItem from="1623501905815" duration="35684000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -224,7 +228,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623527153682</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Restore the IDT">
+      <created>1623530709760</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1623530709760</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,6 +263,7 @@
     <MESSAGE value="Remove Rust bootloader magic and make the kernel 32-bit for now" />
     <MESSAGE value="Restore without_interrupts routine" />
     <MESSAGE value="Restore the GDT" />
-    <option name="LAST_COMMIT_MESSAGE" value="Restore the GDT" />
+    <MESSAGE value="Restore the IDT" />
+    <option name="LAST_COMMIT_MESSAGE" value="Restore the IDT" />
   </component>
 </project>

@@ -30,3 +30,8 @@ _start:
     jmp 1b
 
 .size _start, . - _start
+
+.section .kernel_end
+.align 4096
+.global kernel_end
+kernel_end:

@@ -25,4 +25,9 @@ SECTIONS
 		*(COMMON)
 		*(.bss)
 	}
+
+    .kernel_end BLOCK(4K) : ALIGN(4K)
+    {
+        *(.kernel_end)
+    }
 }
