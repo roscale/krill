@@ -24,14 +24,11 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Restore the IDT">
-      <change afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/util.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Identity paging test">
+      <change afterPath="$PROJECT_DIR$/src/frame_allocator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linker.ld" beforeDir="false" afterPath="$PROJECT_DIR$/linker.ld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/boot.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/boot.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,7 +232,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623530709760</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Identity paging test">
+      <created>1623682921568</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1623682921568</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -264,6 +268,7 @@
     <MESSAGE value="Restore without_interrupts routine" />
     <MESSAGE value="Restore the GDT" />
     <MESSAGE value="Restore the IDT" />
-    <option name="LAST_COMMIT_MESSAGE" value="Restore the IDT" />
+    <MESSAGE value="Identity paging test" />
+    <option name="LAST_COMMIT_MESSAGE" value="Identity paging test" />
   </component>
 </project>

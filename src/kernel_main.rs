@@ -14,6 +14,7 @@ use core::ffi::c_void;
 use core::mem::transmute;
 use core::panic::PanicInfo;
 
+use crate::frame_allocator::FrameAllocator;
 use crate::inline_asm::hlt_loop;
 use crate::libstd::memset;
 use crate::paging::PageTable;
@@ -34,6 +35,7 @@ mod pic;
 mod ps2;
 mod paging;
 mod util;
+mod frame_allocator;
 
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
@@ -45,7 +47,7 @@ pub extern "C" fn kernel_main() -> ! {
     gdt::GDT.load();
     idt::IDT.load();
 
-    let free_frames: *const u8 = unsafe {
+    let kernel_end: *const u8 = unsafe {
         extern "C" {
             // Dummy data type. The address of this variable is the beginning of free frames.
             static mut kernel_end: c_void;
@@ -53,13 +55,24 @@ pub extern "C" fn kernel_main() -> ! {
         transmute(&mut kernel_end)
     };
 
+    let mut frame_allocator = FrameAllocator::new();
+
+    // Mark kernel frames as occupied.
+    for frame in (0..kernel_end as u32).step_by(4.KiB()) {
+        frame_allocator.mark_occupied(frame);
+    }
+
     let mut page_directory: &mut paging::PageDirectory = unsafe {
-        transmute(free_frames)
+        transmute(frame_allocator.allocate_frame().unwrap())
     };
 
     let mut page_table: &mut PageTable = unsafe {
-        transmute(free_frames.offset(4.KiB()))
+        transmute(frame_allocator.allocate_frame().unwrap())
     };
+
+    dbg!(kernel_end);
+    dbg!(page_directory as *mut _);
+    dbg!(page_table as *mut _);
 
     let mut frame = 0;
     for page_entry in &mut page_table.page_table_entries {
