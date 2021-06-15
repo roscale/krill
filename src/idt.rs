@@ -196,8 +196,9 @@ extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, e
     panic!("general_protection_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn page_fault_handler(_frame: StackFrame, error_code: u32) {
-    panic!("page_fault_handler with error code {}", error_code);
+extern "x86-interrupt" fn page_fault_handler(frame: StackFrame, error_code: u32) {
+    println!("page_fault_handler with error code {}", error_code);
+    panic!("{}", frame);
 }
 
 extern "x86-interrupt" fn x87_floating_point_handler(_frame: StackFrame) {

@@ -24,3 +24,10 @@ set_page_directory:
     mov    eax, [esp+4]
     mov    cr3, eax
     ret
+
+.global jump_to_higher_half
+jump_to_higher_half:
+    mov    eax, [esp + 4]
+    add    eax, HIGHER_HALF_ADDRESS
+    add    esp, HIGHER_HALF_ADDRESS
+    call   eax

@@ -24,11 +24,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Identity paging test">
-      <change afterPath="$PROJECT_DIR$/src/frame_allocator.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Implement a frame allocator">
+      <change afterPath="$PROJECT_DIR$/src/page_allocator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/boot.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/boot.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/paging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,11 +125,6 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Cargo.Build - debug" />
       <item itemvalue="Cargo.Build - release" />
@@ -136,11 +133,6 @@
       <item itemvalue="Makefile Target.run_debug" />
       <item itemvalue="Makefile Target.all" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Makefile Target.all" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
@@ -168,6 +160,7 @@
       <workItem from="1599564366839" duration="22230000" />
       <workItem from="1599744788907" duration="11576000" />
       <workItem from="1623501905815" duration="35684000" />
+      <workItem from="1623791272276" duration="9138000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -239,7 +232,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623682921568</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Implement a frame allocator">
+      <created>1623706687969</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1623706687969</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,6 +269,7 @@
     <MESSAGE value="Restore the GDT" />
     <MESSAGE value="Restore the IDT" />
     <MESSAGE value="Identity paging test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Identity paging test" />
+    <MESSAGE value="Implement a frame allocator" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement a frame allocator" />
   </component>
 </project>
