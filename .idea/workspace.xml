@@ -24,13 +24,13 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Implement a frame allocator">
-      <change afterPath="$PROJECT_DIR$/src/page_allocator.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Implement higher half kernel mapping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frame_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/frame_allocator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/paging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vga.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/vga.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +50,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="i686" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -160,7 +160,7 @@
       <workItem from="1599564366839" duration="22230000" />
       <workItem from="1599744788907" duration="11576000" />
       <workItem from="1623501905815" duration="35684000" />
-      <workItem from="1623791272276" duration="9138000" />
+      <workItem from="1623791272276" duration="16399000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -239,7 +239,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623706687969</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Implement higher half kernel mapping">
+      <created>1623800472774</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1623800472774</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,6 +277,7 @@
     <MESSAGE value="Restore the IDT" />
     <MESSAGE value="Identity paging test" />
     <MESSAGE value="Implement a frame allocator" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement a frame allocator" />
+    <MESSAGE value="Implement higher half kernel mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implement higher half kernel mapping" />
   </component>
 </project>

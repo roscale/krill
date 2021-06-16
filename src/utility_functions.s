@@ -1,5 +1,11 @@
 .intel_syntax noprefix
 
+# scratch registers: eax, ecx, edx, esi, edi
+
+# .global outb
+# outb:
+#     mov    eax, [esp + 4]
+
 .global reload_segments
 reload_segments:
     jmp    0x08:reload_cs
@@ -22,6 +28,12 @@ enable_paging:
 .global set_page_directory
 set_page_directory:
     mov    eax, [esp+4]
+    mov    cr3, eax
+    ret
+
+.global reload_cr3
+reload_cr3:
+    mov    eax, cr3
     mov    cr3, eax
     ret
 

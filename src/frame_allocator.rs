@@ -1,3 +1,4 @@
+use crate::libstd::memset;
 use crate::util::{BitOperations, Units};
 
 // 1024 * 1024 pages
@@ -22,7 +23,9 @@ impl FrameAllocator {
                 for i in 0..8 {
                     if byte.get_bit(i) == true {
                         byte.set_bit(i, false);
-                        return Some((offset + i as u32 * 4.KiB()) as *mut _);
+                        let address = (offset + i as u32 * 4.KiB()) as *mut u8;
+                        unsafe { memset(address, 0, 4.KiB()) }; // Clear the memory
+                        return Some(address);
                     }
                 }
             }

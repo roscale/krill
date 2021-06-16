@@ -28,6 +28,10 @@ impl PageDirectoryEntry {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.value = 0;
+    }
+
     pub fn is_present(&self) -> bool {
         self.value.get_bit(0)
     }

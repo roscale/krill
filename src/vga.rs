@@ -6,12 +6,13 @@ use spin::Mutex;
 
 use crate::inline_asm::{inb, outb};
 use crate::libstd::memcpy;
+use crate::HIGHER_HALF;
 
 lazy_static! {
     pub static ref VGA_TEXT_STATE: Mutex<VGATextState> = Mutex::new(VGATextState::new());
 }
 
-const BUFFER_ADDRESS: *mut u8 = 0xb8000 as *mut u8;
+const BUFFER_ADDRESS: *mut u8 = (HIGHER_HALF + 0xb8000) as *mut u8;
 const BUFFER_HEIGHT: u16 = 25;
 const BUFFER_WIDTH: u16 = 80;
 const BUFFER_SIZE: u16 = BUFFER_WIDTH * BUFFER_HEIGHT;

@@ -38,13 +38,15 @@ mod util;
 mod frame_allocator;
 mod page_allocator;
 
+const HIGHER_HALF: u32 = 0xc0000000;
 #[no_mangle]
-pub static HIGHER_HALF_ADDRESS: u32 = 0xC0000000;
+static HIGHER_HALF_ADDRESS: u32 = HIGHER_HALF;
 
 extern "C" {
     static kernel_end: c_void;
     fn set_page_directory(ptr: *const paging::PageDirectory);
     fn enable_paging();
+    fn reload_cr3();
     fn jump_to_higher_half(ptr: extern "C" fn() -> !);
 }
 
@@ -108,8 +110,8 @@ pub extern "C" fn kernel_main() -> ! {
     last_entry.set_frame_address(page_table_address);
 
     // Higher-half kernel mapping: 3..=4 GiB
-    let mut index = 1.MiB() / 4.KiB();
-    for frame in (1.MiB()..kernel_end_addr as u32).step_by(4.KiB()) {
+    let mut index = 0;
+    for frame in (0..kernel_end_addr as u32).step_by(4.KiB()) {
         let mut entry = &mut page_table_768.entries[index];
         entry.set_present(true);
         entry.set_frame_address(frame);
@@ -120,7 +122,7 @@ pub extern "C" fn kernel_main() -> ! {
     page_directory.entries[768].set_page_table_address(unsafe { transmute(page_table_768) });
 
     unsafe {
-        set_page_directory(&*page_directory);
+        set_page_directory(page_directory);
         enable_paging();
         jump_to_higher_half(higher_half);
     }
@@ -136,17 +138,33 @@ pub extern "C" fn higher_half() -> ! {
     gdt::GDT.load();
     idt::IDT.load();
 
-    {
-        let mut vga_text_state = vga::VGA_TEXT_STATE.lock();
-        vga_text_state.clear_screen();
-        vga_text_state.enable_cursor();
-    }
-    println!("HIGHER HALF");
-    vga_println!("HIGHER HALF");
+    println!("I can see this");
 
-    vga_print!("Keyboard support: ");
+    // Simulate a page fault to see if it works: OK
+    // let a = 0xA0000000 as *mut u8;
+    // unsafe {
+    //     *a = 44;
+    // }
 
-    init_pic();
+    let page_directory: &mut paging::PageDirectory = unsafe { transmute(0xFFFFF000_u32) };
+    page_directory.entries[0].clear(); // Unmap the lower half kernel
+    unsafe { reload_cr3() }
+
+    println!("I can't see this"); // The VGA text buffer is filled with random characters
+
+    // {
+    //     let mut vga_text_state = vga::VGA_TEXT_STATE.lock();
+    //     vga_text_state.clear_screen();
+    //     vga_text_state.enable_cursor();
+    // }
+    // println!("HIGHER HALF");
+    // vga_println!("HIGHER HALF");
+    //
+    // vga_print!("Keyboard support: ");
+    //
+    // init_pic();
+
+    // println!("MERGE OK");
 
     hlt_loop();
 }
