@@ -75,14 +75,14 @@ pub extern "C" fn kernel_main() -> ! {
     dbg!(page_table as *mut _);
 
     let mut frame = 0;
-    for page_entry in &mut page_table.page_table_entries {
+    for page_entry in &mut page_table.entries {
         page_entry.set_present(true);
         page_entry.set_frame_address(frame);
         frame += 4.KiB();
     }
 
-    page_directory.page_directory_entries[0].set_present(true);
-    page_directory.page_directory_entries[0].set_page_table_address(page_table as *const _ as u32);
+    page_directory.entries[0].set_present(true);
+    page_directory.entries[0].set_page_table_address(page_table as *const _ as u32);
 
     unsafe {
         extern "C" {

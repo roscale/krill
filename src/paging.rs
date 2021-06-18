@@ -4,13 +4,13 @@ use crate::util::BitOperations;
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct PageDirectory {
-    pub page_directory_entries: [PageDirectoryEntry; 1024],
+    pub entries: [PageDirectoryEntry; 1024],
 }
 
 impl PageDirectory {
     pub fn new() -> Self {
         Self {
-            page_directory_entries: [PageDirectoryEntry::new(); 1024],
+            entries: [PageDirectoryEntry::new(); 1024],
         }
     }
 }
@@ -36,6 +36,7 @@ impl PageDirectoryEntry {
         self.value.set_bit(0, value);
     }
 
+    /// Even if this is false, the kernel is still able to write to it and only userspace is blocked. (default)
     pub fn is_read_write(&self) -> bool {
         self.value.get_bit(1)
     }
@@ -99,13 +100,13 @@ impl PageDirectoryEntry {
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct PageTable {
-    pub page_table_entries: [PageTableEntry; 1024],
+    pub entries: [PageTableEntry; 1024],
 }
 
 impl PageTable {
     pub fn new() -> Self {
         PageTable {
-            page_table_entries: [PageTableEntry::new(); 1024],
+            entries: [PageTableEntry::new(); 1024],
         }
     }
 }
