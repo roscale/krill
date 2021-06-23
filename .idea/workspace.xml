@@ -24,12 +24,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Revert higher half commit">
-      <change afterPath="$PROJECT_DIR$/src/page_mapper.rs" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Refactor paging code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/frame_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/frame_allocator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gdt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gdt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tss.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/tss.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +83,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+    <property name="settings.editor.selected.configurable" value="ssh.settings" />
   </component>
   <component name="ReaderModeSettings">
     <option name="showLigatures" value="true" />
@@ -100,7 +98,7 @@
       <recent name="$PROJECT_DIR$/.idea" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Build - debug">
+  <component name="RunManager" selected="GDB Remote Debug.Remote Debug">
     <configuration name="Build - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="build" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -147,6 +145,10 @@
     <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>$USER_HOME$/.subversion</configuration>
+    <option name="sshConnectionType" value="PASSWORD" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="" />
@@ -174,7 +176,7 @@
       <workItem from="1624312924049" duration="47000" />
       <workItem from="1624313009037" duration="282000" />
       <workItem from="1624447673477" duration="3618000" />
-      <workItem from="1624471851472" duration="185000" />
+      <workItem from="1624471851472" duration="4412000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -253,7 +255,14 @@
       <option name="project" value="LOCAL" />
       <updated>1624045016748</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Refactor paging code">
+      <created>1624472230471</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1624472230471</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -284,7 +293,8 @@
     <MESSAGE value="Restore the IDT" />
     <MESSAGE value="Identity paging test" />
     <MESSAGE value="Revert higher half commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revert higher half commit" />
+    <MESSAGE value="Refactor paging code" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor paging code" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
   </component>
@@ -295,6 +305,11 @@
           <url>file://$PROJECT_DIR$/src/page_mapper.rs</url>
           <line>62</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/kernel_main.rs</url>
+          <line>73</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

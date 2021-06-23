@@ -1,12 +1,13 @@
 //! https://wiki.osdev.org/Task_State_Segment
 
+use core::mem::size_of;
 lazy_static! {
     pub static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
-        tss.interrupt_stacks[0] = {
+        tss.esp0 = {
             const STACK_SIZE: usize = 5 * 4096;
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
-            unsafe { &STACK as *const _ as u64 + STACK_SIZE as u64}
+            unsafe { &STACK as *const _ as u32 + STACK_SIZE as u32}
         };
         tss
     };
@@ -15,29 +16,21 @@ lazy_static! {
 #[repr(C, packed)]
 #[derive(Debug, Copy, Clone)]
 pub struct TaskStateSegment {
-    pub _reserved1: u32,
-    pub stack_pointers: [u64; 3],
-    pub _reserved2: u32,
-    pub _reserved3: u32,
-    pub interrupt_stacks: [u64; 7],
-    pub _reserved4: u32,
-    pub _reserved5: u32,
-    pub _reserved6: u16,
-    pub iomap_base: u16,
+    pub _unused1: u32,
+    pub esp0: u32,
+    pub ss0: u32,
+    pub _unused2: [u32; 22],
+    pub iopb: u32,
 }
 
 impl TaskStateSegment {
     pub fn new() -> TaskStateSegment {
         TaskStateSegment {
-            _reserved1: 0,
-            stack_pointers: [0; 3],
-            _reserved2: 0,
-            _reserved3: 0,
-            interrupt_stacks: [0; 7],
-            _reserved4: 0,
-            _reserved5: 0,
-            _reserved6: 0,
-            iomap_base: 0,
+            _unused1: 0,
+            esp0: 0, // set above
+            ss0: 0x10,
+            _unused2: [0; 22],
+            iopb: size_of::<TaskStateSegment>() as u32,
         }
     }
 }

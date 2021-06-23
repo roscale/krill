@@ -1,7 +1,7 @@
 //! https://wiki.osdev.org/GDT
 //! https://wiki.osdev.org/GDT_Tutorial
 
-use core::mem::size_of;
+use core::mem::{size_of, transmute};
 
 use crate::inline_asm::{lgdt, ltr};
 use crate::tss::{TaskStateSegment, TSS};
@@ -16,7 +16,7 @@ pub struct GlobalDescriptorTable {
     pub null_descriptor: Descriptor,
     pub code_segment: Descriptor,
     pub data_segment: Descriptor,
-    pub tss_segment: TSSDescriptor,
+    pub tss_segment: Descriptor,
 }
 
 impl GlobalDescriptorTable {
@@ -25,11 +25,11 @@ impl GlobalDescriptorTable {
             null_descriptor: Descriptor::new(0, 0, 0, 0),
             code_segment: Descriptor::new(0, 0xFFFFF, 0x9A, 0xC),
             data_segment: Descriptor::new(0, 0xFFFFF, 0x92, 0xC),
-            tss_segment: TSSDescriptor::new(
-                &*TSS as *const _ as u64,
-                (size_of::<TaskStateSegment>() - 1) as u32,
+            tss_segment: Descriptor::new(
+                unsafe { transmute(&*TSS) },
+                (size_of::<TaskStateSegment>()) as u32,
                 0x89,
-                0,
+                0x40,
             ),
         }
     }
@@ -80,35 +80,6 @@ impl Descriptor {
             access,
             flags_and_limit_hi: (flags << 4) | (limit >> 16) as u8,
             base_hi: (base >> 24) as u8,
-        }
-    }
-}
-
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
-pub struct TSSDescriptor {
-    pub limit_lo: u16,
-    pub base_lo_32: u16,
-    pub base_mi_32: u8,
-    pub access: u8,
-    pub flags_and_limit_hi: u8,
-    pub base_hi_32: u8,
-    pub base_hi_64: u64,
-}
-
-impl TSSDescriptor {
-    pub(crate) fn new(base: u64, limit: u32, access: u8, flags: u8) -> TSSDescriptor {
-        if limit > 0xFFFFF {
-            panic!("Invalid size {}. Must be a 20 bit number", limit);
-        }
-        TSSDescriptor {
-            limit_lo: limit as u16,
-            base_lo_32: base as u16,
-            base_mi_32: (base >> 16) as u8,
-            access,
-            flags_and_limit_hi: (flags << 4) | (limit >> 16) as u8,
-            base_hi_32: (base >> 24) as u8,
-            base_hi_64: base >> 32,
         }
     }
 }
