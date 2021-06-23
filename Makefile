@@ -22,7 +22,7 @@ clean:
 	rm -rf krill.bin src/boot.o src/utility_functions.o
 
 run: all
-	qemu-system-i386 -m 4G -kernel krill.bin -serial stdio
+	qemu-system-i386 -m 4G -kernel krill.bin -serial stdio -d int -D log.txt
 
 run_debug: all
-	qemu-system-i386 -m 4G -kernel krill.bin -S -s -daemonize
+	qemu-system-i386 -m 4G -kernel krill.bin -S -s -daemonize -d int -D log.txt

@@ -16,6 +16,8 @@ pub struct GlobalDescriptorTable {
     pub null_descriptor: Descriptor,
     pub code_segment: Descriptor,
     pub data_segment: Descriptor,
+    pub user_code_segment: Descriptor,
+    pub user_data_segment: Descriptor,
     pub tss_segment: Descriptor,
 }
 
@@ -25,6 +27,8 @@ impl GlobalDescriptorTable {
             null_descriptor: Descriptor::new(0, 0, 0, 0),
             code_segment: Descriptor::new(0, 0xFFFFF, 0x9A, 0xC),
             data_segment: Descriptor::new(0, 0xFFFFF, 0x92, 0xC),
+            user_code_segment: Descriptor::new(0, 0xFFFFF, 0xFA, 0xC),
+            user_data_segment: Descriptor::new(0, 0xFFFFF, 0xF2, 0xC),
             tss_segment: Descriptor::new(
                 unsafe { transmute(&*TSS) },
                 (size_of::<TaskStateSegment>()) as u32,
@@ -52,7 +56,7 @@ impl GlobalDescriptorTable {
         unsafe { reload_segments(); }
 
         // Load the TSS
-        let tss_segment_selector = 3 << 3;
+        let tss_segment_selector = (5 << 3) | 3; // or 3 to set RPL to ring 3
         ltr(tss_segment_selector);
     }
 }

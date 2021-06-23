@@ -18,11 +18,19 @@ pub fn create_initial_page_directory() -> &'static mut paging::PageDirectory {
         transmute(page_directory_address)
     };
 
+    for e in &mut pd.entries {
+        e.set_user_accessible(true);
+    }
+
     let last_entry = pd.entries.last_mut().unwrap();
     last_entry.set_present(true);
     last_entry.set_page_table_address(page_directory_address as u32);
 
     let mut kernel_page_table = create_page_table();
+
+    for e in &mut kernel_page_table.entries {
+        e.set_user_accessible(true);
+    }
 
     let mut frame = 0;
     for page_entry in &mut kernel_page_table.entries {

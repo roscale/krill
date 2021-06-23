@@ -49,8 +49,8 @@ pub extern "C" fn kernel_main() -> ! {
     Serial(COM3).init(38400);
     Serial(COM4).init(38400);
 
-    gdt::GDT.load();
     idt::IDT.load();
+    gdt::GDT.load();
 
     let mut page_directory = create_initial_page_directory();
 
@@ -72,6 +72,11 @@ pub extern "C" fn kernel_main() -> ! {
     vga_print!("Keyboard support: ");
 
     init_pic();
+
+    extern "C" {
+        fn jump_usermode();
+    }
+    unsafe { jump_usermode(); }
 
     hlt_loop();
 }

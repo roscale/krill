@@ -198,6 +198,10 @@ extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, e
 
 extern "x86-interrupt" fn page_fault_handler(frame: StackFrame, error_code: u32) {
     println!("page_fault_handler with error code {}", error_code);
+    extern "C" {
+        fn get_cr2() -> u32;
+    }
+    unsafe { println!("Faulty address: 0x{:x}", get_cr2()); }
     panic!("{}", frame);
 }
 
