@@ -1,4 +1,30 @@
+use core::ffi::c_void;
+use core::mem::transmute;
+
+use spin::Mutex;
+
 use crate::util::{BitOperations, Units};
+
+lazy_static! {
+    pub static ref FRAME_ALLOCATOR: Mutex<FrameAllocator> = Mutex::new({
+        let mut fa = FrameAllocator::new();
+
+        let kernel_end: *const u8 = unsafe {
+            extern "C" {
+                // Dummy data type. The address of this variable is the beginning of free frames.
+                static mut kernel_end: c_void;
+            }
+            transmute(&mut kernel_end)
+        };
+
+        // Mark kernel frames as occupied.
+        for frame in (0..kernel_end as u32).step_by(4.KiB()) {
+            fa.mark_occupied(frame);
+        }
+
+        fa
+    });
+}
 
 // 1024 * 1024 pages
 // 8 pages per byte
@@ -45,7 +71,7 @@ impl FrameAllocator {
         self.set_frame_bit(frame_address, false);
     }
 
-    fn get_frame_bit(&mut self, frame_address: u32) -> bool {
+    fn get_frame_bit(&self, frame_address: u32) -> bool {
         if frame_address % 4.KiB() != 0 {
             panic!("Frame address {} not aligned to 4 KiB.", frame_address);
         }

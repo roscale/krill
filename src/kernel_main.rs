@@ -15,8 +15,9 @@ use core::mem::transmute;
 use core::panic::PanicInfo;
 
 use crate::frame_allocator::FrameAllocator;
-use crate::inline_asm::hlt_loop;
+use crate::inline_asm::{disable_interrupts, hlt_loop};
 use crate::libstd::memset;
+use crate::page_mapper::{map_page, create_initial_page_directory, create_page_table};
 use crate::paging::PageTable;
 use crate::pic::init_pic;
 use crate::serial::{COM1, COM2, COM3, COM4, Serial};
@@ -36,6 +37,10 @@ mod ps2;
 mod paging;
 mod util;
 mod frame_allocator;
+mod page_mapper;
+
+// Change this when enabling higher half kernel.
+const KERNEL_VIRTUAL_OFFSET: u32 = 0;
 
 #[no_mangle]
 pub extern "C" fn kernel_main() -> ! {
@@ -47,42 +52,7 @@ pub extern "C" fn kernel_main() -> ! {
     gdt::GDT.load();
     idt::IDT.load();
 
-    let kernel_end: *const u8 = unsafe {
-        extern "C" {
-            // Dummy data type. The address of this variable is the beginning of free frames.
-            static mut kernel_end: c_void;
-        }
-        transmute(&mut kernel_end)
-    };
-
-    let mut frame_allocator = FrameAllocator::new();
-
-    // Mark kernel frames as occupied.
-    for frame in (0..kernel_end as u32).step_by(4.KiB()) {
-        frame_allocator.mark_occupied(frame);
-    }
-
-    let mut page_directory: &mut paging::PageDirectory = unsafe {
-        transmute(frame_allocator.allocate_frame().unwrap())
-    };
-
-    let mut page_table: &mut PageTable = unsafe {
-        transmute(frame_allocator.allocate_frame().unwrap())
-    };
-
-    dbg!(kernel_end);
-    dbg!(page_directory as *mut _);
-    dbg!(page_table as *mut _);
-
-    let mut frame = 0;
-    for page_entry in &mut page_table.entries {
-        page_entry.set_present(true);
-        page_entry.set_frame_address(frame);
-        frame += 4.KiB();
-    }
-
-    page_directory.entries[0].set_present(true);
-    page_directory.entries[0].set_page_table_address(page_table as *const _ as u32);
+    let mut page_directory = create_initial_page_directory();
 
     unsafe {
         extern "C" {
@@ -98,9 +68,11 @@ pub extern "C" fn kernel_main() -> ! {
         vga_text_state.clear_screen();
         vga_text_state.enable_cursor();
     }
+
     vga_print!("Keyboard support: ");
 
     init_pic();
+
     hlt_loop();
 }
 
@@ -108,6 +80,7 @@ pub extern "C" fn kernel_main() -> ! {
 #[panic_handler]
 #[allow(unused_must_use)]
 fn panic(info: &PanicInfo) -> ! {
+    disable_interrupts();
     println!();
     println!("-------------------------------------------------");
     println!("KERNEL PANIC");
@@ -132,5 +105,7 @@ fn panic(info: &PanicInfo) -> ! {
         println!("{}", s);
     }
     println!("-------------------------------------------------");
-    loop {}
+    loop {
+        hlt_loop();
+    }
 }

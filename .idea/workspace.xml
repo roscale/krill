@@ -24,10 +24,12 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Identity paging test">
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Revert higher half commit">
+      <change afterPath="$PROJECT_DIR$/src/page_mapper.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frame_allocator.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/frame_allocator.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/paging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,16 +72,23 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+  </component>
+  <component name="ReaderModeSettings">
+    <option name="showLigatures" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -91,12 +100,7 @@
       <recent name="$PROJECT_DIR$/.idea" />
     </key>
   </component>
-  <component name="RunManager" selected="Makefile Target.run">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Cargo.Build - debug">
     <configuration name="Build - debug" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="command" value="build" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -104,6 +108,7 @@
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
@@ -119,6 +124,7 @@
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
@@ -135,14 +141,9 @@
       <item itemvalue="Makefile Target.run_debug" />
       <item itemvalue="Makefile Target.all" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Makefile Target.all" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="RustProjectSettings">
-    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin" />
     <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -167,6 +168,13 @@
       <workItem from="1599564366839" duration="22230000" />
       <workItem from="1599744788907" duration="11576000" />
       <workItem from="1623501905815" duration="35684000" />
+      <workItem from="1624045477763" duration="11051000" />
+      <workItem from="1624219525807" duration="4864000" />
+      <workItem from="1624312598797" duration="304000" />
+      <workItem from="1624312924049" duration="47000" />
+      <workItem from="1624313009037" duration="282000" />
+      <workItem from="1624447673477" duration="3618000" />
+      <workItem from="1624471851472" duration="185000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -238,7 +246,14 @@
       <option name="project" value="LOCAL" />
       <updated>1623682921568</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Revert higher half commit">
+      <created>1624045016748</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1624045016748</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,8 +283,24 @@
     <MESSAGE value="Restore the GDT" />
     <MESSAGE value="Restore the IDT" />
     <MESSAGE value="Identity paging test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Identity paging test" />
+    <MESSAGE value="Revert higher half commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revert higher half commit" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/page_mapper.rs</url>
+          <line>62</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
