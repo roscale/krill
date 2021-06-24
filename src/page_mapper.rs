@@ -20,6 +20,7 @@ pub fn create_initial_page_directory() -> &'static mut paging::PageDirectory {
 
     for e in &mut pd.entries {
         e.set_user_accessible(true);
+        e.set_user_writable(true);
     }
 
     let last_entry = pd.entries.last_mut().unwrap();
@@ -30,6 +31,7 @@ pub fn create_initial_page_directory() -> &'static mut paging::PageDirectory {
 
     for e in &mut kernel_page_table.entries {
         e.set_user_accessible(true);
+        e.set_read_write(true);
     }
 
     let mut frame = 0;

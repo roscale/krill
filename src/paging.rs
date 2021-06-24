@@ -36,12 +36,12 @@ impl PageDirectoryEntry {
         self.value.set_bit(0, value);
     }
 
-    /// Even if this is false, the kernel is still able to write to it and only userspace is blocked. (default)
-    pub fn is_read_write(&self) -> bool {
+    /// The kernel can always write regardless of this flag.
+    pub fn is_user_writable(&self) -> bool {
         self.value.get_bit(1)
     }
 
-    pub fn set_read_write(&mut self, value: bool) {
+    pub fn set_user_writable(&mut self, value: bool) {
         self.value.set_bit(1, value);
     }
 

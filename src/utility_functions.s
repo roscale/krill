@@ -54,4 +54,16 @@ get_esp:
 
 .global hello_userspace
 hello_userspace:
-    jmp $
+    sub esp, 4
+a:
+    mov ebx, 0x10000000
+c:
+    mov [esp + 4], ebx
+    mov ebx, [esp + 4]
+    cmp ebx, 0
+    jz z
+    dec ebx
+    jmp c
+z:
+    int 0x80
+    jmp a

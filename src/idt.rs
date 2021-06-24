@@ -6,7 +6,7 @@ use core::mem::size_of;
 
 use pc_keyboard::{DecodedKey, KeyCode, KeyState};
 
-use crate::inline_asm::{get_cs, lidt, without_interrupts};
+use crate::inline_asm::{get_cs, lidt, without_interrupts, hlt_loop, disable_interrupts};
 use crate::pic::{PIC_LINE_KEYBOARD, PIC_LINE_TIMER, send_eoi};
 use crate::ps2::read_keyboard_scancode;
 
@@ -21,7 +21,7 @@ pub struct StackFrame {
     pub cs: u32,
     pub flags: u32,
     pub sp: u32,
-    pub ss: u32,
+    pub ds: u32,
 }
 
 impl Display for StackFrame {
@@ -30,7 +30,7 @@ impl Display for StackFrame {
         writeln!(f, "CS: {}", self.cs)?;
         writeln!(f, "FLAGS: {}", self.flags)?;
         writeln!(f, "SP: {}", self.sp)?;
-        writeln!(f, "SS: {}", self.ss)?;
+        writeln!(f, "DS: {}", self.ds)?;
         Ok(())
     }
 }
@@ -72,7 +72,7 @@ pub struct InterruptDescriptorTable {
 impl InterruptDescriptorTable {
     fn new() -> Self {
         let code_segment = get_cs();
-        InterruptDescriptorTable {
+        let mut idt = InterruptDescriptorTable {
             divide_error: Descriptor::new(divide_error_handler as u32, code_segment, 0b1000_1110),
             debug: Descriptor::new(debug_handler as u32, code_segment, 0b1000_1110),
             non_maskable_interrupt: Descriptor::new(non_maskable_interrupt_handler as u32, code_segment, 0b1000_1110),
@@ -97,10 +97,15 @@ impl InterruptDescriptorTable {
             reserved_2: [Descriptor::new(unused_handler as u32, 0, 0); 9],
             security_exception: Descriptor::new(security_exception_handler as u32, code_segment, 0b1000_1110),
             reserved_3: Descriptor::new(unused_handler as u32, 0, 0),
-            pic_timer: Descriptor::new(pic_timer_handler as u32, code_segment, 0b10001110),
-            pic_keyboard: Descriptor::new(pic_keyboard_handler as u32, code_segment, 0b10001110),
-            interrupts: [Descriptor::new(unused_handler as u32, 0, 0); 256 - 30],
-        }
+            pic_timer: Descriptor::new(pic_timer_handler as u32, code_segment, 0b1000_1110),
+            pic_keyboard: Descriptor::new(pic_keyboard_handler as u32, code_segment, 0b1000_1110),
+            interrupts: [Descriptor::new(system_call as u32, code_segment, 0); 256 - 30],
+        };
+
+        // Interrupt routine for system calls.
+        idt.interrupts[94] = Descriptor::new(system_call as u32, code_segment, 0b1110_1110); // WHY 94?
+
+        idt
     }
 
     pub fn load(&'static self) {
@@ -152,7 +157,6 @@ extern "x86-interrupt" fn non_maskable_interrupt_handler(_frame: StackFrame) {
 }
 
 extern "x86-interrupt" fn breakpoint_handler(_frame: StackFrame) {
-    // panic!("breakpoint_handler");
     println!("Breakpoint handler");
 }
 
@@ -263,4 +267,8 @@ extern "x86-interrupt" fn pic_keyboard_handler(_frame: StackFrame) {
         }
     });
     send_eoi(PIC_LINE_KEYBOARD);
+}
+
+extern "x86-interrupt" fn system_call(frame: StackFrame) {
+    dbg!(frame);
 }
