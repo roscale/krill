@@ -2,30 +2,27 @@ use core::mem::transmute;
 
 use spin::Mutex;
 
-use crate::frame_allocator::*;
-use crate::paging;
+use crate::*;
 use crate::util::{BitOperations, Units};
+use alloc::boxed::Box;
+use crate::paging::PageDirectory;
 
 const PD_ADDRESS: u32 = 0xFFFFF000;
 lazy_static! {
-    pub static ref page_directory: Mutex<&'static mut paging::PageDirectory>
+    pub static ref GLOBAL_PAGE_DIRECTORY: Mutex<&'static mut PageDirectory>
         = Mutex::new(unsafe { transmute(PD_ADDRESS) });
 }
 
-pub fn create_initial_page_directory() -> &'static mut paging::PageDirectory {
-    let page_directory_address = FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
-    let mut pd: &mut paging::PageDirectory = unsafe {
-        transmute(page_directory_address)
-    };
+pub fn create_initial_page_directory() -> Box<PageDirectory> {
+    let mut pd = Box::new(PageDirectory::new());
 
     for e in &mut pd.entries {
         e.set_user_accessible(true);
         e.set_user_writable(true);
     }
 
-    let last_entry = pd.entries.last_mut().unwrap();
-    last_entry.set_present(true);
-    last_entry.set_page_table_address(page_directory_address as u32);
+    pd.entries[1023].set_present(true);
+    pd.entries[1023].set_page_table_address(unsafe { transmute(&*pd) });
 
     let mut kernel_page_table = create_page_table();
 
@@ -42,22 +39,19 @@ pub fn create_initial_page_directory() -> &'static mut paging::PageDirectory {
     }
 
     pd.entries[0].set_present(true);
-    pd.entries[0].set_page_table_address(kernel_page_table as *const _ as u32);
+    pd.entries[0].set_page_table_address(unsafe { transmute(&*kernel_page_table) });
 
-    dbg!(kernel_page_table as *const _ as u32);
+    dbg!(&*pd as *const _);
+    dbg!(&*kernel_page_table as *const _);
 
     pd
 }
 
-pub fn create_page_table() -> &'static mut paging::PageTable {
-    let page_table_address = FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
-    let mut page_table: &mut paging::PageTable = unsafe {
-        transmute(page_table_address as u32)
-    };
+pub fn create_page_table() -> Box<PageTable> {
+    let mut page_table = Box::new(PageTable::new());
 
-    let last_entry = page_table.entries.last_mut().unwrap();
-    last_entry.set_present(true);
-    last_entry.set_frame_address(page_table_address as u32);
+    page_table.entries[1023].set_present(true);
+    page_table.entries[1023].set_frame_address(unsafe { transmute(&*page_table) });
 
     page_table
 }
@@ -69,14 +63,14 @@ pub fn map_page(physical_address: u32, virtual_address: u32) {
     let pd_index = virtual_address.get_bits(22..=31) as usize;
     let pt_index = virtual_address.get_bits(12..=21) as usize;
 
-    let mut pd = page_directory.lock();
-    let mut pd_entry = &mut pd.entries[pd_index];
+    let mut pd = GLOBAL_PAGE_DIRECTORY.lock();
+    let pd_entry = &mut pd.entries[pd_index];
     if !pd_entry.is_present() {
         pd_entry.set_present(true);
         pd_entry.set_page_table_address(unsafe { transmute(create_page_table()) });
     }
 
-    let mut pt: &mut paging::PageTable = unsafe { transmute(0xFFC0_0000 + 4.KiB() * pd_index) };
+    let pt: &mut PageTable = unsafe { transmute(0xFFC0_0000 + 4.KiB() * pd_index) };
 
     let entry = &mut pt.entries[pt_index];
     entry.set_present(true);

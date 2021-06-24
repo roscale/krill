@@ -24,12 +24,17 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Enter userspace">
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="System calls proof of concept">
+      <change afterPath="$PROJECT_DIR$/src/allocator.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.cargo/config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/.cargo/config.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/frame_allocator.rs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/page_mapper.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/page_mapper.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/paging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +190,7 @@
       <workItem from="1624447673477" duration="3618000" />
       <workItem from="1624471851472" duration="17887000" />
       <workItem from="1624548923194" duration="958000" />
-      <workItem from="1624553358007" duration="1497000" />
+      <workItem from="1624553358007" duration="7443000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -285,7 +290,14 @@
       <option name="project" value="LOCAL" />
       <updated>1624487001182</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="System calls proof of concept">
+      <created>1624554906055</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1624554906055</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -296,7 +308,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="i686" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -319,20 +343,10 @@
     <MESSAGE value="Refactor paging code" />
     <MESSAGE value="Modify the TSS for 32 bit" />
     <MESSAGE value="Enter userspace" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enter userspace" />
+    <MESSAGE value="System calls proof of concept" />
+    <option name="LAST_COMMIT_MESSAGE" value="System calls proof of concept" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/page_mapper.rs</url>
-          <line>72</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

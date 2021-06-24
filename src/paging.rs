@@ -1,8 +1,7 @@
-use crate::util;
 use crate::util::BitOperations;
 
 #[derive(Debug)]
-#[repr(transparent)]
+#[repr(C, align(4096))]
 pub struct PageDirectory {
     pub entries: [PageDirectoryEntry; 1024],
 }
@@ -16,7 +15,7 @@ impl PageDirectory {
 }
 
 #[derive(Debug, Copy, Clone)]
-#[repr(transparent)]
+#[repr(C)]
 pub struct PageDirectoryEntry {
     value: u32,
 }
@@ -98,7 +97,7 @@ impl PageDirectoryEntry {
 }
 
 #[derive(Debug)]
-#[repr(transparent)]
+#[repr(C, align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 1024],
 }
@@ -112,7 +111,7 @@ impl PageTable {
 }
 
 #[derive(Debug, Copy, Clone)]
-#[repr(transparent)]
+#[repr(C)]
 pub struct PageTableEntry {
     value: u32,
 }

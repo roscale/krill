@@ -6,7 +6,7 @@ use core::mem::size_of;
 
 use pc_keyboard::{DecodedKey, KeyCode, KeyState};
 
-use crate::inline_asm::{get_cs, lidt, without_interrupts, hlt_loop, disable_interrupts};
+use crate::inline_asm::{get_cs, lidt, without_interrupts};
 use crate::pic::{PIC_LINE_KEYBOARD, PIC_LINE_TIMER, send_eoi};
 use crate::ps2::read_keyboard_scancode;
 
