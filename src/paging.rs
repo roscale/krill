@@ -1,6 +1,6 @@
 use crate::util::BitOperations;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[repr(C, align(4096))]
 pub struct PageDirectory {
     pub entries: [PageDirectoryEntry; 1024],

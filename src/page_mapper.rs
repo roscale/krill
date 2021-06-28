@@ -24,25 +24,28 @@ pub fn create_initial_page_directory() -> Box<PageDirectory> {
     pd.entries[1023].set_present(true);
     pd.entries[1023].set_page_table_address(unsafe { transmute(&*pd) });
 
-    let mut kernel_page_table = create_page_table();
+    let mut i = 0;
+    for f in (0..4.MiB()).step_by(4.MiB()) {
+        let mut kernel_page_table = create_page_table();
 
-    for e in &mut kernel_page_table.entries {
-        e.set_user_accessible(true);
-        e.set_read_write(true);
+        for e in &mut kernel_page_table.entries {
+            e.set_present(true);
+            e.set_user_accessible(true);
+            e.set_read_write(true);
+        }
+
+        let mut frame = f;
+        for page_entry in &mut kernel_page_table.entries {
+            page_entry.set_frame_address(frame);
+            frame += 4.KiB();
+        }
+
+        pd.entries[i].set_present(true);
+        pd.entries[i].set_page_table_address(unsafe { transmute(&*kernel_page_table) });
+
+        i += 1;
+        Box::leak(kernel_page_table);
     }
-
-    let mut frame = 0;
-    for page_entry in &mut kernel_page_table.entries {
-        page_entry.set_present(true);
-        page_entry.set_frame_address(frame);
-        frame += 4.KiB();
-    }
-
-    pd.entries[0].set_present(true);
-    pd.entries[0].set_page_table_address(unsafe { transmute(&*kernel_page_table) });
-
-    dbg!(&*pd as *const _);
-    dbg!(&*kernel_page_table as *const _);
 
     pd
 }

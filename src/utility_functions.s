@@ -52,18 +52,18 @@ get_esp:
     mov eax, esp
     ret
 
-.global hello_userspace
-hello_userspace:
-    sub esp, 4
-a:
-    mov ebx, 0x10000000
-c:
-    mov [esp + 4], ebx
+.global write_syscall
+write_syscall:
+    mov eax, 4
     mov ebx, [esp + 4]
-    cmp ebx, 0
-    jz z
-    dec ebx
-    jmp c
-z:
+    mov ecx, [esp + 8]
+    mov edx, [esp + 12]
     int 0x80
-    jmp a
+    ret
+
+.global system_call_shim
+system_call_shim:
+    pusha
+    call system_call
+    popa
+    iret

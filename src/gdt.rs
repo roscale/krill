@@ -5,6 +5,7 @@ use core::mem::{size_of, transmute};
 
 use crate::inline_asm::{lgdt, ltr};
 use crate::tss::{TaskStateSegment, TSS};
+use crate::utility_functions::reload_segments;
 
 lazy_static! {
     pub static ref GDT: GlobalDescriptorTable = GlobalDescriptorTable::new();
@@ -50,9 +51,6 @@ impl GlobalDescriptorTable {
             address: self as *const _ as u32,
         });
 
-        extern "C" {
-            fn reload_segments();
-        }
         unsafe { reload_segments(); }
 
         // Load the TSS

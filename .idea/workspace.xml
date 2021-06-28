@@ -24,17 +24,16 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="System calls proof of concept">
-      <change afterPath="$PROJECT_DIR$/src/allocator.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.cargo/config.toml" beforeDir="false" afterPath="$PROJECT_DIR$/.cargo/config.toml" afterDir="false" />
+    <list default="true" id="9ee98608-0ec0-4c3d-a525-bdc9b33c3afb" name="Default Changelist" comment="Use a linked list allocator for heap allocation&#10;&#10;This replaces the current frame allocator and allocates frames required &#10;by the page directory and page tables, using this new allocator.">
+      <change afterPath="$PROJECT_DIR$/src/scheduler.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utility_functions.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/frame_allocator.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gdt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/gdt.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/idt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/idt.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/kernel_main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/kernel_main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/page_mapper.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/page_mapper.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/paging.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/paging.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utility_functions.s" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility_functions.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +81,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../paru" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
@@ -90,7 +89,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="ssh.settings" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
   </component>
   <component name="ReaderModeSettings">
     <option name="showLigatures" value="true" />
@@ -136,11 +135,6 @@
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -190,7 +184,11 @@
       <workItem from="1624447673477" duration="3618000" />
       <workItem from="1624471851472" duration="17887000" />
       <workItem from="1624548923194" duration="958000" />
-      <workItem from="1624553358007" duration="7443000" />
+      <workItem from="1624553358007" duration="16194000" />
+      <workItem from="1624663736083" duration="9223000" />
+      <workItem from="1624723178824" duration="15155000" />
+      <workItem from="1624904486752" duration="9000" />
+      <workItem from="1624919010168" duration="350000" />
     </task>
     <task id="LOCAL-00001" summary="Create git repository">
       <created>1598877419846</created>
@@ -297,7 +295,14 @@
       <option name="project" value="LOCAL" />
       <updated>1624554906055</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Use a linked list allocator for heap allocation&#10;&#10;This replaces the current frame allocator and allocates frames required &#10;by the page directory and page tables, using this new allocator.">
+      <created>1624561779655</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1624561779655</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -344,7 +349,8 @@
     <MESSAGE value="Modify the TSS for 32 bit" />
     <MESSAGE value="Enter userspace" />
     <MESSAGE value="System calls proof of concept" />
-    <option name="LAST_COMMIT_MESSAGE" value="System calls proof of concept" />
+    <MESSAGE value="Use a linked list allocator for heap allocation&#10;&#10;This replaces the current frame allocator and allocates frames required &#10;by the page directory and page tables, using this new allocator." />
+    <option name="LAST_COMMIT_MESSAGE" value="Use a linked list allocator for heap allocation&#10;&#10;This replaces the current frame allocator and allocates frames required &#10;by the page directory and page tables, using this new allocator." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
   </component>

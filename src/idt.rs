@@ -2,13 +2,17 @@
 
 use core::fmt::{Display, Formatter};
 use core::fmt;
-use core::mem::size_of;
+use core::mem::{size_of, transmute};
 
 use pc_keyboard::{DecodedKey, KeyCode, KeyState};
 
 use crate::inline_asm::{get_cs, lidt, without_interrupts};
 use crate::pic::{PIC_LINE_KEYBOARD, PIC_LINE_TIMER, send_eoi};
 use crate::ps2::read_keyboard_scancode;
+use alloc::string::String;
+use core::ptr::slice_from_raw_parts_mut;
+use crate::scheduler::{GeneralPurposeRegisters, schedule_next_task};
+use crate::utility_functions::{system_call_shim, get_cr2};
 
 lazy_static! {
     pub static ref IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
@@ -16,21 +20,21 @@ lazy_static! {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub struct StackFrame {
+pub struct InterruptStackFrame {
     pub ip: u32,
     pub cs: u32,
     pub flags: u32,
     pub sp: u32,
-    pub ds: u32,
+    pub ss: u32,
 }
 
-impl Display for StackFrame {
+impl Display for InterruptStackFrame {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         writeln!(f, "IP: {}", self.ip)?;
         writeln!(f, "CS: {}", self.cs)?;
         writeln!(f, "FLAGS: {}", self.flags)?;
         writeln!(f, "SP: {}", self.sp)?;
-        writeln!(f, "DS: {}", self.ds)?;
+        writeln!(f, "SS: {}", self.ss)?;
         Ok(())
     }
 }
@@ -99,11 +103,11 @@ impl InterruptDescriptorTable {
             reserved_3: Descriptor::new(unused_handler as u32, 0, 0),
             pic_timer: Descriptor::new(pic_timer_handler as u32, code_segment, 0b1000_1110),
             pic_keyboard: Descriptor::new(pic_keyboard_handler as u32, code_segment, 0b1000_1110),
-            interrupts: [Descriptor::new(system_call as u32, code_segment, 0); 256 - 30],
+            interrupts: [Descriptor::new(0, 0, 0); 256 - 30],
         };
 
         // Interrupt routine for system calls.
-        idt.interrupts[94] = Descriptor::new(system_call as u32, code_segment, 0b1110_1110); // WHY 94?
+        idt.interrupts[94] = Descriptor::new(system_call_shim as u32, code_segment, 0b1110_1110); // WHY 94?
 
         idt
     }
@@ -144,106 +148,102 @@ impl Descriptor {
     }
 }
 
-extern "x86-interrupt" fn divide_error_handler(frame: StackFrame) {
+extern "x86-interrupt" fn divide_error_handler(frame: InterruptStackFrame) {
     panic!("divide_error\nStack frame:\n{}", frame);
 }
 
-extern "x86-interrupt" fn debug_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn debug_handler(_frame: InterruptStackFrame) {
     panic!("debug_handler");
 }
 
-extern "x86-interrupt" fn non_maskable_interrupt_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn non_maskable_interrupt_handler(_frame: InterruptStackFrame) {
     panic!("non_maskable_interrupt_handler");
 }
 
-extern "x86-interrupt" fn breakpoint_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn breakpoint_handler(_frame: InterruptStackFrame) {
     println!("Breakpoint handler");
 }
 
-extern "x86-interrupt" fn overflow_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn overflow_handler(_frame: InterruptStackFrame) {
     panic!("overflow_handler");
 }
 
-extern "x86-interrupt" fn bound_range_exceeded_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn bound_range_exceeded_handler(_frame: InterruptStackFrame) {
     panic!("bound_range_exceeded_handler");
 }
 
-extern "x86-interrupt" fn invalid_opcode_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn invalid_opcode_handler(_frame: InterruptStackFrame) {
     panic!("invalid_opcode_handler");
 }
 
-extern "x86-interrupt" fn device_not_available_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn device_not_available_handler(_frame: InterruptStackFrame) {
     panic!("device_not_available_handler");
 }
 
-extern "x86-interrupt" fn double_fault_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn double_fault_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("double_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn coprocessor_segment_overrun_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn coprocessor_segment_overrun_handler(_frame: InterruptStackFrame) {
     panic!("coprocessor_segment_overrun_handler");
 }
 
-extern "x86-interrupt" fn invalid_tss_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn invalid_tss_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("invalid_tss_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn segment_not_present_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn segment_not_present_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("segment_not_present_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn stack_segment_fault_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn stack_segment_fault_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("stack_segment_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn general_protection_fault_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn general_protection_fault_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("general_protection_fault_handler with error code {}", error_code);
 }
 
-extern "x86-interrupt" fn page_fault_handler(frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn page_fault_handler(frame: InterruptStackFrame, error_code: u32) {
     println!("page_fault_handler with error code {}", error_code);
-    extern "C" {
-        fn get_cr2() -> u32;
-    }
     unsafe { println!("Faulty address: 0x{:x}", get_cr2()); }
     panic!("{}", frame);
 }
 
-extern "x86-interrupt" fn x87_floating_point_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn x87_floating_point_handler(_frame: InterruptStackFrame) {
     panic!("x87_floating_point")
 }
 
-extern "x86-interrupt" fn alignment_check_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn alignment_check_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("alignment_check {}", error_code)
 }
 
-extern "x86-interrupt" fn machine_check_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn machine_check_handler(_frame: InterruptStackFrame) {
     panic!("machine_check")
 }
 
-extern "x86-interrupt" fn simd_floating_point_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn simd_floating_point_handler(_frame: InterruptStackFrame) {
     panic!("simd_floating_point")
 }
 
-extern "x86-interrupt" fn virtualization_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn virtualization_handler(_frame: InterruptStackFrame) {
     panic!("virtualization")
 }
 
-extern "x86-interrupt" fn security_exception_handler(_frame: StackFrame, error_code: u32) {
+extern "x86-interrupt" fn security_exception_handler(_frame: InterruptStackFrame, error_code: u32) {
     panic!("security_exception {}", error_code)
 }
 
-extern "x86-interrupt" fn unused_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn unused_handler(_frame: InterruptStackFrame) {
     panic!("unused interrupt");
 }
 
 // Hardware interrupt handlers
-extern "x86-interrupt" fn pic_timer_handler(_frame: StackFrame) {
-    print!(".");
+extern "x86-interrupt" fn pic_timer_handler(_frame: InterruptStackFrame) {
     send_eoi(PIC_LINE_TIMER);
 }
 
-extern "x86-interrupt" fn pic_keyboard_handler(_frame: StackFrame) {
+extern "x86-interrupt" fn pic_keyboard_handler(_frame: InterruptStackFrame) {
     let scancode = read_keyboard_scancode();
     use crate::ps2::KEYBOARD;
 
@@ -254,8 +254,8 @@ extern "x86-interrupt" fn pic_keyboard_handler(_frame: StackFrame) {
                 if key_event.state == KeyState::Down {
                     match key_event.code {
                         KeyCode::Enter => vga_println!(),
-                        KeyCode::Backspace => {},
-                        KeyCode::Tab => {},
+                        KeyCode::Backspace => {}
+                        KeyCode::Tab => {}
                         _ => {
                             if let DecodedKey::Unicode(char) = decoded_key {
                                 vga_print!("{}", char);
@@ -269,6 +269,22 @@ extern "x86-interrupt" fn pic_keyboard_handler(_frame: StackFrame) {
     send_eoi(PIC_LINE_KEYBOARD);
 }
 
-extern "x86-interrupt" fn system_call(frame: StackFrame) {
-    dbg!(frame);
+#[no_mangle]
+extern "C" fn system_call(mut gpr: GeneralPurposeRegisters, mut frame: InterruptStackFrame) {
+    let syscall_number = gpr.eax;
+
+    match syscall_number {
+        4 => {
+            let _fd = gpr.ebx;
+            let buf: *mut u8 = unsafe { transmute(gpr.ecx) };
+            let count: usize = unsafe { transmute(gpr.edx) };
+
+            let byte_slice = slice_from_raw_parts_mut(buf, count);
+            let string = String::from_utf8_lossy(unsafe { &*byte_slice });
+            print!("{}", string);
+        }
+        _ => panic!("Unknown syscall number {}", syscall_number),
+    }
+
+    schedule_next_task(&mut frame, &mut gpr);
 }

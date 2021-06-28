@@ -23,6 +23,9 @@ use crate::pic::init_pic;
 use crate::serial::{COM1, COM2, COM3, COM4, Serial};
 use crate::util::Units;
 use crate::allocator::init_heap;
+use crate::scheduler::{SCHEDULER, Task, Registers};
+use alloc::boxed::Box;
+use crate::utility_functions::{jump_usermode, get_esp, set_page_directory, enable_paging, write_syscall};
 
 mod libstd;
 mod inline_asm;
@@ -39,6 +42,8 @@ mod paging;
 mod util;
 mod page_mapper;
 mod allocator;
+mod scheduler;
+mod utility_functions;
 
 // Change this when enabling higher half kernel.
 const _KERNEL_VIRTUAL_OFFSET: u32 = 0;
@@ -63,14 +68,47 @@ pub extern "C" fn kernel_main() -> ! {
     idt::IDT.load();
     gdt::GDT.load();
 
-    let page_directory = create_initial_page_directory();
-
     unsafe {
-        extern "C" {
-            fn set_page_directory(ptr: *const paging::PageDirectory);
-            fn enable_paging();
-        }
-        set_page_directory(&*page_directory);
+        let page_directory = create_initial_page_directory();
+        let mut scheduler = SCHEDULER.lock();
+
+        scheduler.ready_tasks.push(Box::new(Task::new(
+            Registers {
+                cs: 27,
+                ss: 35,
+                eflags: 0,
+                eip: hello_userspace as u32,
+                esp: get_esp() + 1000,
+                ebp: 0,
+                eax: 0,
+                ebx: 0,
+                ecx: 0,
+                edx: 0,
+                esi: 0,
+                edi: 0,
+            },
+            page_directory.clone(),
+        )));
+        scheduler.ready_tasks.push(Box::new(Task::new(
+            Registers {
+                cs: 27,
+                ss: 35,
+                eflags: 0,
+                eip: program2 as u32,
+                esp: get_esp() + 2000,
+                ebp: 0,
+                eax: 0,
+                ebx: 0,
+                ecx: 0,
+                edx: 0,
+                esi: 0,
+                edi: 0,
+            },
+            page_directory,
+        )));
+
+        let task = scheduler.ready_tasks.first().unwrap();
+        set_page_directory(&*task.address_space);
         enable_paging();
     }
 
@@ -84,12 +122,7 @@ pub extern "C" fn kernel_main() -> ! {
 
     init_pic();
 
-    extern "C" {
-        fn jump_usermode();
-    }
     unsafe { jump_usermode(); }
-
-    hlt_loop();
 }
 
 /// Function called on panic
@@ -123,5 +156,30 @@ fn panic(info: &PanicInfo) -> ! {
     }
     loop {
         hlt_loop();
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn hello_userspace() {
+    let mut c = 'a';
+    loop {
+        for _ in 0..3000000 {
+            // busy wait
+        }
+        unsafe {
+            let text = "THIS IS USERSPACE ";
+            write_syscall(0, text.as_ptr(), text.len());
+            write_syscall(0, transmute(&c), 1);
+            write_syscall(0, "\n".as_ptr(), 1);
+            c = (c as u8 + 1) as char;
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn program2() {
+    loop {
+        let text = " * ";
+        unsafe { write_syscall(0, text.as_ptr(), text.len()); }
     }
 }
